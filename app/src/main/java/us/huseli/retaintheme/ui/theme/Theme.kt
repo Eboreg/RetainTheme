@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
-private val LightColors = lightColorScheme(
+val LightColors = lightColorScheme(
     primary = RetainColorLight.Primary,
     onPrimary = RetainColorLight.OnPrimary,
     primaryContainer = RetainColorLight.PrimaryContainer,
@@ -47,7 +47,7 @@ private val LightColors = lightColorScheme(
     scrim = RetainColorLight.Scrim,
 )
 
-private val DarkColors = darkColorScheme(
+val DarkColors = darkColorScheme(
     primary = RetainColorDark.Primary,
     onPrimary = RetainColorDark.OnPrimary,
     primaryContainer = RetainColorDark.PrimaryContainer,
@@ -79,6 +79,7 @@ private val DarkColors = darkColorScheme(
     scrim = RetainColorDark.Scrim,
 )
 
+@Suppress("unused")
 @Composable
 fun RetainTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
