@@ -4,8 +4,11 @@ plugins {
     id("maven-publish")
 }
 
+@Suppress("PropertyName")
+val VERSION = "1.2.2"
+
 group = "us.huseli"
-version = "1.2.1"
+version = VERSION
 
 kotlin {
     jvmToolchain(17)
@@ -64,7 +67,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = "us.huseli"
                 artifactId = "retaintheme"
-                version = "1.2.1"
+                version = VERSION
 
                 from(components["release"])
             }
