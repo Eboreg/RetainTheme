@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "us.huseli"
-version = "1.2.0"
+version = "1.2.1"
 
 kotlin {
     jvmToolchain(17)
@@ -64,7 +64,7 @@ afterEvaluate {
             create<MavenPublication>("release") {
                 groupId = "us.huseli"
                 artifactId = "retaintheme"
-                version = "1.2.0"
+                version = "1.2.1"
 
                 from(components["release"])
             }
