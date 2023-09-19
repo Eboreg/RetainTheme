@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package us.huseli.retaintheme.compose
 
 import androidx.compose.foundation.layout.PaddingValues

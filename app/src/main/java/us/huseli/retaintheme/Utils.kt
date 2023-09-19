@@ -1,5 +1,10 @@
+@file:Suppress("unused")
+
 package us.huseli.retaintheme
 
+import android.content.res.Configuration
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -18,3 +23,7 @@ fun Duration.sensibleFormat() = toComponents { hours, minutes, seconds, _ ->
 }
 
 fun Double.formatDuration() = seconds.sensibleFormat()
+
+@Suppress("BooleanMethodIsAlwaysInverted")
+@Composable
+fun isInLandscapeMode() = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
