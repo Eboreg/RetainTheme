@@ -25,7 +25,7 @@ class MainMenuItem(
 
 @Composable
 fun HorizontalMainMenu(
-    activeScreen: String,
+    activeScreen: String?,
     mainMenuItems: List<MainMenuItem>,
     onMenuItemClick: (String) -> Unit,
 ) {
@@ -48,7 +48,7 @@ fun HorizontalMainMenu(
 @Composable
 fun VerticalMainMenu(
     modifier: Modifier = Modifier,
-    activeScreen: String,
+    activeScreen: String?,
     mainMenuItems: List<MainMenuItem>,
     onMenuItemClick: (String) -> Unit,
 ) {

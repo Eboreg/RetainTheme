@@ -18,7 +18,7 @@ import us.huseli.retaintheme.isInLandscapeMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResponsiveScaffold(
-    activeScreen: String,
+    activeScreen: String?,
     mainMenuItems: List<MainMenuItem>,
     onMenuItemClick: (String) -> Unit,
     snackbarHost: @Composable () -> Unit = {},
