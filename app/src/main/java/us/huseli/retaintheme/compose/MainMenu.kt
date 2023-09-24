@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 class MainMenuItem(
     val contentScreen: String,
     val icon: ImageVector,
-    val description: String,
+    val description: String? = null,
 )
 
 @Composable
@@ -38,7 +38,7 @@ fun HorizontalMainMenu(
                 selected = activeScreen == item.contentScreen,
                 onClick = { onMenuItemClick(item.contentScreen) },
                 icon = { Icon(item.icon, null) },
-                label = { Text(item.description) },
+                label = item.description?.let { { Text(item.description) } },
             )
         }
     }
@@ -60,7 +60,7 @@ fun VerticalMainMenu(
                     NavigationDrawerItem(
                         modifier = Modifier.height(50.dp),
                         icon = { Icon(item.icon, null) },
-                        label = { Text(item.description) },
+                        label = { item.description?.let { Text(item.description) } },
                         selected = activeScreen == item.contentScreen,
                         onClick = { onMenuItemClick(item.contentScreen) },
                         shape = RectangleShape,

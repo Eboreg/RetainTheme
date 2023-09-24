@@ -5,7 +5,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "1.3.1"
+val VERSION = "1.3.2"
 
 group = "us.huseli"
 version = VERSION
@@ -20,7 +20,6 @@ android {
 
     defaultConfig {
         minSdk = 21
-        // targetSdk = 34
     }
 
     buildTypes {
