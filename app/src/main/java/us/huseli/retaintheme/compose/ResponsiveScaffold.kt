@@ -27,7 +27,7 @@ fun ResponsiveScaffold(
     landscapeMenuModifier: Modifier = Modifier,
     snackbarHost: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
-    landscapeMenu: (@Composable ColumnScope.() -> Unit)? = null,
+    landscapeMenu: (@Composable ColumnScope.(PaddingValues) -> Unit)? = null,
     portraitMenu: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
@@ -39,7 +39,7 @@ fun ResponsiveScaffold(
         ) { innerPadding ->
             Row {
                 Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                    landscapeMenu?.let { it() } ?: VerticalMainMenu(
+                    landscapeMenu?.let { it(innerPadding) } ?: VerticalMainMenu(
                         modifier = landscapeMenuModifier.padding(innerPadding),
                         activeScreen = activeScreen,
                         mainMenuItems = mainMenuItems,
