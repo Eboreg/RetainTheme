@@ -4,6 +4,7 @@ package us.huseli.retaintheme.compose
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,10 +23,12 @@ fun ResponsiveScaffold(
     mainMenuItems: List<MainMenuItem>,
     onMenuItemClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    horizontalMenuModifier: Modifier = Modifier,
-    verticalMenuModifier: Modifier = Modifier,
+    portraitMenuModifier: Modifier = Modifier,
+    landscapeMenuModifier: Modifier = Modifier,
     snackbarHost: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
+    landscapeMenu: (@Composable ColumnScope.() -> Unit)? = null,
+    portraitMenu: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     if (isInLandscapeMode()) {
@@ -36,8 +39,8 @@ fun ResponsiveScaffold(
         ) { innerPadding ->
             Row {
                 Column(modifier = Modifier.width(IntrinsicSize.Min)) {
-                    VerticalMainMenu(
-                        modifier = verticalMenuModifier.padding(innerPadding),
+                    landscapeMenu?.let { it() } ?: VerticalMainMenu(
+                        modifier = landscapeMenuModifier.padding(innerPadding),
                         activeScreen = activeScreen,
                         mainMenuItems = mainMenuItems,
                         onMenuItemClick = onMenuItemClick,
@@ -50,9 +53,9 @@ fun ResponsiveScaffold(
         Scaffold(
             snackbarHost = snackbarHost,
             bottomBar = bottomBar,
-            topBar = {
+            topBar = portraitMenu ?: {
                 HorizontalMainMenu(
-                    modifier = horizontalMenuModifier,
+                    modifier = portraitMenuModifier,
                     activeScreen = activeScreen,
                     mainMenuItems = mainMenuItems,
                     onMenuItemClick = onMenuItemClick,
