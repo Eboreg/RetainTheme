@@ -25,6 +25,7 @@ class MainMenuItem(
 
 @Composable
 fun HorizontalMainMenu(
+    modifier: Modifier = Modifier,
     activeScreen: String?,
     mainMenuItems: List<MainMenuItem>,
     onMenuItemClick: (String) -> Unit,
@@ -32,6 +33,7 @@ fun HorizontalMainMenu(
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 2.dp,
+        modifier = modifier,
     ) {
         mainMenuItems.forEach { item ->
             NavigationBarItem(

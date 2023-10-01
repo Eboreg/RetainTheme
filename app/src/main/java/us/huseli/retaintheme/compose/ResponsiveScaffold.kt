@@ -21,19 +21,23 @@ fun ResponsiveScaffold(
     activeScreen: String?,
     mainMenuItems: List<MainMenuItem>,
     onMenuItemClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    horizontalMenuModifier: Modifier = Modifier,
+    verticalMenuModifier: Modifier = Modifier,
     snackbarHost: @Composable () -> Unit = {},
     bottomBar: @Composable () -> Unit = {},
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     if (isInLandscapeMode()) {
         Scaffold(
+            modifier = modifier,
             snackbarHost = snackbarHost,
             bottomBar = bottomBar,
         ) { innerPadding ->
             Row {
                 Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                     VerticalMainMenu(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = verticalMenuModifier.padding(innerPadding),
                         activeScreen = activeScreen,
                         mainMenuItems = mainMenuItems,
                         onMenuItemClick = onMenuItemClick,
@@ -48,12 +52,13 @@ fun ResponsiveScaffold(
             bottomBar = bottomBar,
             topBar = {
                 HorizontalMainMenu(
+                    modifier = horizontalMenuModifier,
                     activeScreen = activeScreen,
                     mainMenuItems = mainMenuItems,
                     onMenuItemClick = onMenuItemClick,
                 )
             },
-            content = content
+            content = content,
         )
     }
 }
