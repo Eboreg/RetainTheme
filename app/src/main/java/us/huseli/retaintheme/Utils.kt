@@ -3,8 +3,13 @@
 package us.huseli.retaintheme
 
 import android.content.res.Configuration
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -107,3 +112,16 @@ fun String.toDuration(): Duration {
  */
 fun String.sanitizeFilename(): String =
     replace(Regex("[/\\\\?%*:|\"<>\\x7F\\x00-\\x1F]"), "-")
+
+
+fun List<String>.leadingChars(): List<Char> =
+    mapNotNull { string ->
+        string.replace(Regex("[^\\w&&[^0-9]]"), "#").getOrNull(0)?.uppercaseChar()
+    }.distinct().sorted()
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun Instant.isoDate(): String {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
+    return formatter.format(this)
+}
