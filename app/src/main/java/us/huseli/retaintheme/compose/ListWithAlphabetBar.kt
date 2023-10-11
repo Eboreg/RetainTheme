@@ -33,6 +33,7 @@ import us.huseli.retaintheme.prune
 @Composable
 inline fun <T> ListWithAlphabetBar(
     modifier: Modifier = Modifier,
+    barModifier: Modifier = Modifier,
     scope: CoroutineScope = rememberCoroutineScope(),
     characters: Collection<Char>,
     listState: LazyListState,
@@ -55,7 +56,7 @@ inline fun <T> ListWithAlphabetBar(
                 val maxCharacters = (maxHeightDp / 30.dp).toInt()
                 val displayedCharacters = characters.prune(maxCharacters)
 
-                Box(modifier = Modifier.width(barWidth).fillMaxHeight()) {
+                Box(modifier = barModifier.width(barWidth).fillMaxHeight()) {
                     displayedCharacters.forEachIndexed { index, char ->
                         Box(
                             modifier = Modifier

@@ -34,6 +34,7 @@ import kotlin.math.roundToInt
 @Composable
 inline fun ListWithNumericBar(
     modifier: Modifier = Modifier,
+    barModifier: Modifier = Modifier,
     scope: CoroutineScope = rememberCoroutineScope(),
     listState: LazyListState,
     minItems: Int = 30,
@@ -65,7 +66,7 @@ inline fun ListWithNumericBar(
             }
 
             if (itemIndices.isNotEmpty() && listSize >= minItems) {
-                Box(modifier = Modifier.width(barWidth).fillMaxHeight()) {
+                Box(modifier = barModifier.width(barWidth).fillMaxHeight()) {
                     itemIndices.forEachIndexed { index, itemIndex ->
                         Box(
                             modifier = Modifier
