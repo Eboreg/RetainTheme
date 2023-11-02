@@ -31,20 +31,40 @@ object SnackbarEngine {
         collectSnackbarMessages(_error, errorSnackbarHostState) { clearError() }
     }
 
-    fun addError(message: String, actionLabel: String, onActionPerformed: () -> Unit) {
-        _error.value = SnackbarMessage(message, actionLabel, onActionPerformed)
+    fun addError(
+        message: String,
+        actionLabel: String,
+        onActionPerformed: () -> Unit,
+        onDismissed: (() -> Unit)? = null,
+    ) {
+        _error.value = SnackbarMessage(
+            message = message,
+            actionLabel = actionLabel,
+            onActionPerformed = onActionPerformed,
+            onDismissed = onDismissed,
+        )
     }
 
-    fun addError(message: String) {
-        _error.value = SnackbarMessage(message = message)
+    fun addError(message: String, onDismissed: (() -> Unit)? = null) {
+        _error.value = SnackbarMessage(message = message, onDismissed = onDismissed)
     }
 
-    fun addInfo(message: String, actionLabel: String, onActionPerformed: () -> Unit) {
-        _info.value = SnackbarMessage(message, actionLabel, onActionPerformed)
+    fun addInfo(
+        message: String,
+        actionLabel: String,
+        onActionPerformed: () -> Unit,
+        onDismissed: (() -> Unit)? = null,
+    ) {
+        _info.value = SnackbarMessage(
+            message = message,
+            actionLabel = actionLabel,
+            onActionPerformed = onActionPerformed,
+            onDismissed = onDismissed,
+        )
     }
 
-    fun addInfo(message: String) {
-        _info.value = SnackbarMessage(message = message)
+    fun addInfo(message: String, onDismissed: (() -> Unit)? = null) {
+        _info.value = SnackbarMessage(message = message, onDismissed = onDismissed)
     }
 
     fun clearError() {
