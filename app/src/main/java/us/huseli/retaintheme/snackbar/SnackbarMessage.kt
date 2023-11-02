@@ -6,6 +6,7 @@ data class SnackbarMessage(
     val message: String,
     val actionLabel: String? = null,
     val onActionPerformed: (() -> Unit)? = null,
+    val onDismissed: (() -> Unit)? = null,
 ) {
     val id: UUID = UUID.randomUUID()
 

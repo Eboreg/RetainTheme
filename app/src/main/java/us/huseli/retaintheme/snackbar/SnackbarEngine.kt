@@ -80,6 +80,9 @@ object SnackbarEngine {
             withDismissAction = true,
             duration = if (message.actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
         )
-        if (result == SnackbarResult.ActionPerformed) message.onActionPerformed?.invoke()
+        when (result) {
+            SnackbarResult.Dismissed -> message.onDismissed?.invoke()
+            SnackbarResult.ActionPerformed -> message.onActionPerformed?.invoke()
+        }
     }
 }
