@@ -58,7 +58,7 @@ object RetainBasicColorsLight : RetainBasicColors {
 }
 
 val LightColors = lightColorScheme(
-    background = Color(0xFFFAFDFD),
+    background = Color(0xFFF8FAFA),
     error = Color(0xFFBA1A1A),
     errorContainer = Color(0xFFFFDAD6),
     inverseOnSurface = Color(0xFFEFF1F1),
@@ -90,7 +90,7 @@ val LightColors = lightColorScheme(
 )
 
 val DarkColors = darkColorScheme(
-    background = Color(0xFF191C1D),
+    background = Color(0xFF101415),
     error = Color(0xFFFFB4AB),
     errorContainer = Color(0xFF93000A),
     inverseOnSurface = Color(0xFF191C1D),
