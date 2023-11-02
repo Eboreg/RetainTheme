@@ -48,14 +48,17 @@ inline fun ListWithNumericBar(
     LaunchedEffect(maxHeightDp, listSize) {
         val maxIndices = (maxHeightDp / 30.dp).toInt()
         val maxValue = listSize - 1
-        val increment = maxValue.toFloat() / (maxIndices - 1)
-        val tempIndices = mutableListOf<Int>()
 
-        for (i in 0 until maxIndices) {
-            val index = (i * increment).roundToInt()
-            if (!tempIndices.contains(index)) tempIndices.add(index)
+        if (maxIndices > 1 && maxValue > 0) {
+            val increment = maxValue.toFloat() / (maxIndices - 1)
+            val tempIndices = mutableListOf<Int>()
+
+            for (i in 0 until maxIndices) {
+                val index = (i * increment).roundToInt()
+                if (!tempIndices.contains(index)) tempIndices.add(index)
+            }
+            itemIndices = tempIndices
         }
-        itemIndices = tempIndices
     }
 
     BoxWithConstraints(modifier = modifier) {
