@@ -2,11 +2,17 @@
 
 package us.huseli.retaintheme
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalConfiguration
+import java.io.File
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -124,4 +130,23 @@ fun List<String>.leadingChars(): List<Char> =
 fun Instant.isoDate(): String {
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault())
     return formatter.format(this)
+}
+
+
+fun File.toBitmap(): Bitmap? = takeIf { it.isFile }?.inputStream().use { BitmapFactory.decodeStream(it) }
+
+
+fun Int.sqrt() = kotlin.math.sqrt(toDouble())
+
+
+fun Double.roundUp() = toInt() + (if (this % 1 > 0) 1 else 0)
+
+
+fun Int.roundUpSqrt() = sqrt().roundUp()
+
+
+fun Context.getActivity(): ComponentActivity? = when (this) {
+    is ComponentActivity -> this
+    is ContextWrapper -> baseContext.getActivity()
+    else -> null
 }
