@@ -5,7 +5,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "2.2.1"
+val VERSION = "2.3.0"
 
 group = "us.huseli"
 version = VERSION
@@ -16,7 +16,7 @@ kotlin {
 
 android {
     namespace = "us.huseli.retaintheme"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
@@ -56,7 +56,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.8.0")
     implementation(platform("androidx.compose:compose-bom:2023.10.00"))
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.navigation:navigation-common-ktx:2.7.4")
+    implementation("androidx.navigation:navigation-common-ktx:2.7.5")
 }
 
 afterEvaluate {
