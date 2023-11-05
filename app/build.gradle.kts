@@ -5,7 +5,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "2.3.0"
+val VERSION = "2.3.1"
 
 group = "us.huseli"
 version = VERSION
@@ -16,7 +16,7 @@ kotlin {
 
 android {
     namespace = "us.huseli.retaintheme"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
