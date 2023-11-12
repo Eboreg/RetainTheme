@@ -18,61 +18,73 @@ import java.util.UUID
 @Suppress("unused", "MemberVisibilityCanBePrivate")
 object SnackbarEngine {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private val _error = MutableStateFlow<SnackbarMessage?>(null)
-    private val _info = MutableStateFlow<SnackbarMessage?>(null)
-    private val _shownIds = MutableStateFlow<List<UUID>>(emptyList())
-    private val _isSnackbarShowing = MutableStateFlow(false)
+    private val error = MutableStateFlow<SnackbarMessage?>(null)
+    private val info = MutableStateFlow<SnackbarMessage?>(null)
+    private val shownIds = MutableStateFlow<List<UUID>>(emptyList())
+    private val isSnackbarShowing = MutableStateFlow(false)
 
     val errorSnackbarHostState = SnackbarHostState()
     val infoSnackbarHostState = SnackbarHostState()
 
     init {
-        collectSnackbarMessages(_info, infoSnackbarHostState) { clearInfo() }
-        collectSnackbarMessages(_error, errorSnackbarHostState) { clearError() }
+        collectSnackbarMessages(info, infoSnackbarHostState) { clearInfo() }
+        collectSnackbarMessages(error, errorSnackbarHostState) { clearError() }
     }
 
     fun addError(
         message: String,
         actionLabel: String,
+        duration: SnackbarDuration = SnackbarDuration.Long,
         onActionPerformed: () -> Unit,
         onDismissed: (() -> Unit)? = null,
     ) {
-        _error.value = SnackbarMessage(
+        error.value = SnackbarMessage(
             message = message,
             actionLabel = actionLabel,
             onActionPerformed = onActionPerformed,
             onDismissed = onDismissed,
+            duration = duration,
         )
     }
 
-    fun addError(message: String, onDismissed: (() -> Unit)? = null) {
-        _error.value = SnackbarMessage(message = message, onDismissed = onDismissed)
+    fun addError(
+        message: String,
+        duration: SnackbarDuration = SnackbarDuration.Short,
+        onDismissed: (() -> Unit)? = null,
+    ) {
+        error.value = SnackbarMessage(message = message, onDismissed = onDismissed, duration = duration)
     }
 
     fun addInfo(
         message: String,
         actionLabel: String,
+        duration: SnackbarDuration = SnackbarDuration.Long,
         onActionPerformed: () -> Unit,
         onDismissed: (() -> Unit)? = null,
     ) {
-        _info.value = SnackbarMessage(
+        info.value = SnackbarMessage(
             message = message,
             actionLabel = actionLabel,
             onActionPerformed = onActionPerformed,
             onDismissed = onDismissed,
+            duration = duration,
         )
     }
 
-    fun addInfo(message: String, onDismissed: (() -> Unit)? = null) {
-        _info.value = SnackbarMessage(message = message, onDismissed = onDismissed)
+    fun addInfo(
+        message: String,
+        duration: SnackbarDuration = SnackbarDuration.Short,
+        onDismissed: (() -> Unit)? = null,
+    ) {
+        info.value = SnackbarMessage(message = message, onDismissed = onDismissed, duration = duration)
     }
 
     fun clearError() {
-        _error.value = null
+        error.value = null
     }
 
     fun clearInfo() {
-        _info.value = null
+        info.value = null
     }
 
     private inline fun collectSnackbarMessages(
@@ -82,14 +94,14 @@ object SnackbarEngine {
     ) = scope.launch {
         messageFlow
             .filterNotNull()
-            .combine(_isSnackbarShowing.filter { !it }) { m, _ -> m }
+            .combine(isSnackbarShowing.filter { !it }) { m, _ -> m }
             .distinctUntilChanged()
             .collect { message ->
-                _isSnackbarShowing.value = true
+                isSnackbarShowing.value = true
                 showSnackbarMessage(message, hostState)
-                _shownIds.value += message.id
+                shownIds.value += message.id
                 clearFunction()
-                _isSnackbarShowing.value = false
+                isSnackbarShowing.value = false
             }
     }
 
@@ -98,7 +110,7 @@ object SnackbarEngine {
             message = message.message,
             actionLabel = message.actionLabel,
             withDismissAction = true,
-            duration = if (message.actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
+            duration = message.duration,
         )
         when (result) {
             SnackbarResult.Dismissed -> message.onDismissed?.invoke()
