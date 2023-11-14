@@ -7,8 +7,8 @@ data class SnackbarMessage(
     val message: String,
     val actionLabel: String? = null,
     val duration: SnackbarDuration = if (actionLabel != null) SnackbarDuration.Long else SnackbarDuration.Short,
-    val onActionPerformed: (() -> Unit)? = null,
-    val onDismissed: (() -> Unit)? = null,
+    val onActionPerformed: () -> Unit = {},
+    val onDismissed: () -> Unit = {},
 ) {
     val id: UUID = UUID.randomUUID()
 

@@ -36,7 +36,7 @@ object SnackbarEngine {
         actionLabel: String,
         duration: SnackbarDuration = SnackbarDuration.Long,
         onActionPerformed: () -> Unit,
-        onDismissed: (() -> Unit)? = null,
+        onDismissed: () -> Unit = {},
     ) {
         error.value = SnackbarMessage(
             message = message,
@@ -50,7 +50,7 @@ object SnackbarEngine {
     fun addError(
         message: String,
         duration: SnackbarDuration = SnackbarDuration.Short,
-        onDismissed: (() -> Unit)? = null,
+        onDismissed: () -> Unit = {},
     ) {
         error.value = SnackbarMessage(message = message, onDismissed = onDismissed, duration = duration)
     }
@@ -60,7 +60,7 @@ object SnackbarEngine {
         actionLabel: String,
         duration: SnackbarDuration = SnackbarDuration.Long,
         onActionPerformed: () -> Unit,
-        onDismissed: (() -> Unit)? = null,
+        onDismissed: () -> Unit = {},
     ) {
         info.value = SnackbarMessage(
             message = message,
@@ -74,7 +74,7 @@ object SnackbarEngine {
     fun addInfo(
         message: String,
         duration: SnackbarDuration = SnackbarDuration.Short,
-        onDismissed: (() -> Unit)? = null,
+        onDismissed: () -> Unit = {},
     ) {
         info.value = SnackbarMessage(message = message, onDismissed = onDismissed, duration = duration)
     }
@@ -113,8 +113,8 @@ object SnackbarEngine {
             duration = message.duration,
         )
         when (result) {
-            SnackbarResult.Dismissed -> message.onDismissed?.invoke()
-            SnackbarResult.ActionPerformed -> message.onActionPerformed?.invoke()
+            SnackbarResult.Dismissed -> message.onDismissed()
+            SnackbarResult.ActionPerformed -> message.onActionPerformed()
         }
     }
 }
