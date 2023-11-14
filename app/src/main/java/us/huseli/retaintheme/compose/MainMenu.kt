@@ -23,11 +23,11 @@ class MainMenuItem(
 )
 
 @Composable
-fun HorizontalMainMenu(
+inline fun HorizontalMainMenu(
     modifier: Modifier = Modifier,
     activeScreen: String?,
     mainMenuItems: List<MainMenuItem>,
-    onMenuItemClick: (String) -> Unit,
+    crossinline onMenuItemClick: (String) -> Unit,
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -46,11 +46,11 @@ fun HorizontalMainMenu(
 }
 
 @Composable
-fun VerticalMainMenu(
+inline fun VerticalMainMenu(
     modifier: Modifier = Modifier,
     activeScreen: String?,
     mainMenuItems: List<MainMenuItem>,
-    onMenuItemClick: (String) -> Unit,
+    crossinline onMenuItemClick: (String) -> Unit,
 ) {
     PermanentNavigationDrawer(
         modifier = modifier,
