@@ -40,6 +40,7 @@ inline fun ListWithNumericBar(
     minItems: Int = 30,
     barWidth: Dp = 30.dp,
     listSize: Int,
+    displayOffset: Int = 1,
     crossinline content: @Composable ColumnScope.() -> Unit,
 ) {
     var maxHeightDp by remember { mutableStateOf(0.dp) }
@@ -79,7 +80,7 @@ inline fun ListWithNumericBar(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = (itemIndex + 1).toString(),
+                                text = (itemIndex + displayOffset).toString(),
                                 textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.outline,
