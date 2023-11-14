@@ -155,10 +155,14 @@ fun Double.roundUp() = toInt() + (if (this % 1 > 0) 1 else 0)
 fun Int.roundUpSqrt() = sqrt().roundUp()
 
 
-fun Context.getActivity(): ComponentActivity? = when (this) {
-    is ComponentActivity -> this
-    is ContextWrapper -> baseContext.getActivity()
-    else -> null
+fun Context.getActivity(): ComponentActivity? {
+    var currentContext = this
+
+    while (currentContext is ContextWrapper) {
+        if (currentContext is ComponentActivity) return currentContext
+        currentContext = currentContext.baseContext
+    }
+    return null
 }
 
 
