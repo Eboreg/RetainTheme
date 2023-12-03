@@ -3,6 +3,7 @@
 package us.huseli.retaintheme.compose
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,11 +23,9 @@ import androidx.compose.ui.unit.dp
 fun SmallOutlinedButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    leadingIcon: ImageVector? = null,
-    text: String,
     height: Dp = 25.dp,
-    textStyle: TextStyle = MaterialTheme.typography.bodySmall,
     enabled: Boolean = true,
+    content: @Composable RowScope.() -> Unit,
 ) {
     OutlinedButton(
         modifier = modifier.height(height),
@@ -34,6 +33,25 @@ fun SmallOutlinedButton(
         shape = ShapeDefaults.ExtraSmall,
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
         enabled = enabled,
+        content = content,
+    )
+}
+
+@Composable
+fun SmallOutlinedButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    leadingIcon: ImageVector? = null,
+    text: String,
+    height: Dp = 25.dp,
+    textStyle: TextStyle = MaterialTheme.typography.bodySmall,
+    enabled: Boolean = true,
+) {
+    SmallOutlinedButton(
+        modifier = modifier,
+        onClick = onClick,
+        enabled = enabled,
+        height = height,
         content = {
             if (leadingIcon != null) Icon(
                 imageVector = leadingIcon,
