@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,6 +27,7 @@ fun SmallOutlinedButton(
     onClick: () -> Unit,
     height: Dp = 25.dp,
     enabled: Boolean = true,
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
     content: @Composable RowScope.() -> Unit,
 ) {
     OutlinedButton(
@@ -34,6 +37,7 @@ fun SmallOutlinedButton(
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
         enabled = enabled,
         content = content,
+        colors = colors,
     )
 }
 
@@ -46,12 +50,14 @@ fun SmallOutlinedButton(
     height: Dp = 25.dp,
     textStyle: TextStyle = MaterialTheme.typography.bodySmall,
     enabled: Boolean = true,
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
 ) {
     SmallOutlinedButton(
         modifier = modifier,
         onClick = onClick,
         enabled = enabled,
         height = height,
+        colors = colors,
         content = {
             if (leadingIcon != null) Icon(
                 imageVector = leadingIcon,
