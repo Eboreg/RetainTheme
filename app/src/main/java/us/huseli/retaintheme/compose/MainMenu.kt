@@ -16,18 +16,18 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
-class MainMenuItem(
-    val contentScreen: String,
+class MainMenuItem<T : Enum<T>>(
+    val contentScreen: T,
     val icon: ImageVector,
     val description: String? = null,
 )
 
 @Composable
-inline fun HorizontalMainMenu(
+inline fun <T : Enum<T>> HorizontalMainMenu(
     modifier: Modifier = Modifier,
-    activeScreen: String?,
-    mainMenuItems: List<MainMenuItem>,
-    crossinline onMenuItemClick: (String) -> Unit,
+    activeScreen: T?,
+    mainMenuItems: List<MainMenuItem<T>>,
+    crossinline onMenuItemClick: (T) -> Unit,
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
@@ -46,11 +46,11 @@ inline fun HorizontalMainMenu(
 }
 
 @Composable
-inline fun VerticalMainMenu(
+inline fun <T : Enum<T>> VerticalMainMenu(
     modifier: Modifier = Modifier,
-    activeScreen: String?,
-    mainMenuItems: List<MainMenuItem>,
-    crossinline onMenuItemClick: (String) -> Unit,
+    activeScreen: T?,
+    mainMenuItems: List<MainMenuItem<T>>,
+    crossinline onMenuItemClick: (T) -> Unit,
 ) {
     PermanentNavigationDrawer(
         modifier = modifier,
