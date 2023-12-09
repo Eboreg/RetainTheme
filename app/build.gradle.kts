@@ -5,7 +5,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "3.0.0"
+val VERSION = "3.1.0"
 
 group = "us.huseli"
 version = VERSION
