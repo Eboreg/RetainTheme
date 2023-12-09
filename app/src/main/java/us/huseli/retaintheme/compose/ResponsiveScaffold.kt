@@ -17,10 +17,10 @@ import androidx.compose.ui.Modifier
 import us.huseli.retaintheme.isInLandscapeMode
 
 @Composable
-fun <T : Enum<T>> ResponsiveScaffold(
-    activeScreen: T?,
-    mainMenuItems: List<MainMenuItem<T>>,
-    onMenuItemClick: (T) -> Unit,
+fun <MI : Enum<MI>> ResponsiveScaffold(
+    activeMenuItemId: MI?,
+    menuItems: List<MenuItem<MI>>,
+    onMenuItemClick: (MI) -> Unit,
     modifier: Modifier = Modifier,
     portraitMenuModifier: Modifier = Modifier,
     landscapeMenuModifier: Modifier = Modifier,
@@ -44,8 +44,8 @@ fun <T : Enum<T>> ResponsiveScaffold(
                 Column(modifier = Modifier.width(IntrinsicSize.Min)) {
                     landscapeMenu?.let { it(innerPadding) } ?: VerticalMainMenu(
                         modifier = landscapeMenuModifier.padding(innerPadding),
-                        activeScreen = activeScreen,
-                        mainMenuItems = mainMenuItems,
+                        activeMenuItemId = activeMenuItemId,
+                        menuItems = menuItems,
                         onMenuItemClick = onMenuItemClick,
                     )
                 }
@@ -59,8 +59,8 @@ fun <T : Enum<T>> ResponsiveScaffold(
             topBar = portraitMenu ?: {
                 HorizontalMainMenu(
                     modifier = portraitMenuModifier,
-                    activeScreen = activeScreen,
-                    mainMenuItems = mainMenuItems,
+                    activeMenuItemId = activeMenuItemId,
+                    menuItems = menuItems,
                     onMenuItemClick = onMenuItemClick,
                 )
             },

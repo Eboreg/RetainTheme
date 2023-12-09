@@ -12,33 +12,45 @@ import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
-class MainMenuItem<T : Enum<T>>(
-    val contentScreen: T,
-    val icon: ImageVector,
+@Suppress("unused")
+class MenuItem<MI : Enum<MI>>(
+    val id: MI,
+    val icon: @Composable () -> Unit,
     val description: String? = null,
-)
+) {
+    constructor(id: MI, imageVector: ImageVector, description: String? = null) :
+        this(id, { Icon(imageVector, null) }, description)
+
+    constructor(id: MI, painter: Painter, description: String? = null) :
+        this(id, { Icon(painter, null) }, description)
+
+    constructor(id: MI, imageBitmap: ImageBitmap, description: String? = null) :
+        this(id, { Icon(imageBitmap, null) }, description)
+}
 
 @Composable
-inline fun <T : Enum<T>> HorizontalMainMenu(
+inline fun <MI : Enum<MI>> HorizontalMainMenu(
     modifier: Modifier = Modifier,
-    activeScreen: T?,
-    mainMenuItems: List<MainMenuItem<T>>,
-    crossinline onMenuItemClick: (T) -> Unit,
+    activeMenuItemId: MI?,
+    menuItems: List<MenuItem<MI>>,
+    crossinline onMenuItemClick: (MI) -> Unit,
 ) {
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 2.dp,
         modifier = modifier,
     ) {
-        mainMenuItems.forEach { item ->
+        menuItems.forEach { item ->
             NavigationBarItem(
-                selected = activeScreen == item.contentScreen,
-                onClick = { onMenuItemClick(item.contentScreen) },
-                icon = { Icon(item.icon, null) },
+                selected = activeMenuItemId == item.id,
+                onClick = { onMenuItemClick(item.id) },
+                icon = item.icon,
                 label = item.description?.let { { Text(item.description) } },
             )
         }
@@ -46,23 +58,23 @@ inline fun <T : Enum<T>> HorizontalMainMenu(
 }
 
 @Composable
-inline fun <T : Enum<T>> VerticalMainMenu(
+inline fun <MI : Enum<MI>> VerticalMainMenu(
     modifier: Modifier = Modifier,
-    activeScreen: T?,
-    mainMenuItems: List<MainMenuItem<T>>,
-    crossinline onMenuItemClick: (T) -> Unit,
+    activeMenuItemId: MI?,
+    menuItems: List<MenuItem<MI>>,
+    crossinline onMenuItemClick: (MI) -> Unit,
 ) {
     PermanentNavigationDrawer(
         modifier = modifier,
         drawerContent = {
             PermanentDrawerSheet(modifier = Modifier.widthIn(max = 200.dp)) {
-                mainMenuItems.forEach { item ->
+                menuItems.forEach { item ->
                     NavigationDrawerItem(
                         modifier = Modifier.height(50.dp),
-                        icon = { Icon(item.icon, null) },
+                        icon = item.icon,
                         label = { item.description?.let { Text(item.description) } },
-                        selected = activeScreen == item.contentScreen,
-                        onClick = { onMenuItemClick(item.contentScreen) },
+                        selected = activeMenuItemId == item.id,
+                        onClick = { onMenuItemClick(item.id) },
                         shape = RectangleShape,
                     )
                 }
