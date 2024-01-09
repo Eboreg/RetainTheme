@@ -3,33 +3,43 @@
 package us.huseli.retaintheme.compose
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
+import kotlin.math.absoluteValue
 
 @Composable
 inline fun ListWithNumericBar(
@@ -41,24 +51,29 @@ inline fun ListWithNumericBar(
     barWidth: Dp = 30.dp,
     listSize: Int,
     displayOffset: Int = 1,
+    itemHeight: Dp? = null,
     crossinline content: @Composable ColumnScope.() -> Unit,
 ) {
     var maxHeightDp by remember { mutableStateOf(0.dp) }
     var itemIndices by remember { mutableStateOf<List<Int>>(emptyList()) }
+    var itemInterval by remember { mutableIntStateOf(0) }
+    val itemsPerScreen by remember(maxHeightDp) {
+        mutableStateOf(itemHeight?.let { itemHeight -> (maxHeightDp / itemHeight).toInt().takeIf { it > 0 } })
+    }
 
     LaunchedEffect(maxHeightDp, listSize) {
-        val maxIndices = (maxHeightDp / 30.dp).toInt()
-        val maxValue = listSize - 1
+        val maxIndexCount = (maxHeightDp / 30.dp).toInt()
+        val indexCount = itemsPerScreen?.let { kotlin.math.min(listSize / it, maxIndexCount) } ?: maxIndexCount
 
-        if (maxIndices > 1 && maxValue > 0) {
-            val increment = maxValue.toFloat() / (maxIndices - 1)
-            val tempIndices = mutableListOf<Int>()
+        if (indexCount > 1 && listSize >= minItems) {
+            val increment = listSize / indexCount
+            val tempIndices = mutableSetOf<Int>()
 
-            for (i in 0 until maxIndices) {
-                val index = (i * increment).roundToInt()
-                if (!tempIndices.contains(index)) tempIndices.add(index)
+            for (i in 0 until listSize step increment) {
+                tempIndices.add(i)
             }
-            itemIndices = tempIndices
+            itemInterval = increment
+            itemIndices = tempIndices.toList()
         }
     }
 
@@ -70,21 +85,50 @@ inline fun ListWithNumericBar(
             }
 
             if (itemIndices.isNotEmpty() && listSize >= minItems) {
-                Box(modifier = barModifier.width(barWidth).fillMaxHeight()) {
-                    itemIndices.forEachIndexed { index, itemIndex ->
-                        Box(
+                var selected by remember { mutableIntStateOf(0) }
+
+                LaunchedEffect(listState) {
+                    snapshotFlow { listState.firstVisibleItemIndex }.collect { firstVisibleItemIndex ->
+                        val itemIndex =
+                            itemsPerScreen?.let { firstVisibleItemIndex + (it / 2) } ?: firstVisibleItemIndex
+                        selected = itemIndices.minBy { (itemIndex - it).absoluteValue }
+                    }
+                }
+
+                Column(
+                    modifier = barModifier.width(barWidth).fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    itemIndices.forEach { itemIndex ->
+                        Surface(
+                            shape = CircleShape,
+                            color = if (itemIndex == selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                            contentColor = if (itemIndex == selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.outline,
                             modifier = Modifier
-                                .offset(0.dp, maxHeightDp * (index.toFloat() / itemIndices.size))
-                                .size(width = barWidth, height = 30.dp)
-                                .clickable { scope.launch { listState.scrollToItem(itemIndex) } },
-                            contentAlignment = Alignment.Center,
+                                .padding(vertical = 1.dp)
+                                .padding(start = 2.dp)
+                                .size(min(barWidth, 30.dp) - 2.dp)
+                                .clickable(
+                                    onClick = {
+                                        scope.launch {
+                                            listState.scrollToItem(itemIndex)
+                                            selected = itemIndex
+                                        }
+                                    },
+                                    indication = rememberRipple(bounded = false, radius = (barWidth / 2) + 5.dp),
+                                    interactionSource = remember { MutableInteractionSource() },
+                                ),
                         ) {
-                            Text(
-                                text = (itemIndex + displayOffset).toString(),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.outline,
-                            )
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                Text(
+                                    text = (itemIndex + displayOffset).toString(),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            }
                         }
                     }
                 }

@@ -3,17 +3,23 @@
 package us.huseli.retaintheme.compose
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,12 +29,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import us.huseli.retaintheme.prune
+import us.huseli.retaintheme.extensions.prune
 
 @Composable
 inline fun <T> ListWithAlphabetBar(
@@ -55,31 +63,45 @@ inline fun <T> ListWithAlphabetBar(
             if (characters.isNotEmpty() && items.size >= minItems) {
                 val maxCharacters = (maxHeightDp / 30.dp).toInt()
                 val displayedCharacters = characters.prune(maxCharacters)
+                var selected by remember { mutableStateOf(displayedCharacters.first()) }
 
                 Box(modifier = barModifier.width(barWidth).fillMaxHeight()) {
                     displayedCharacters.forEachIndexed { index, char ->
-                        Box(
+                        Surface(
+                            shape = CircleShape,
+                            color = if (char == selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                            contentColor = if (char == selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.outline,
                             modifier = Modifier
                                 .offset(0.dp, maxHeightDp * (index.toFloat() / displayedCharacters.size))
-                                .size(width = barWidth, height = 30.dp)
-                                .clickable {
-                                    scope.launch {
-                                        if (char == '#') listState.scrollToItem(0)
-                                        else {
-                                            items.indexOfFirst { selector(it).startsWith(char, true) }
-                                                .takeIf { it > -1 }
-                                                ?.also { pos -> listState.scrollToItem(pos) }
+                                .padding(vertical = 1.dp)
+                                .padding(start = 2.dp)
+                                .size(min(barWidth, 30.dp) - 2.dp)
+                                .clickable(
+                                    onClick = {
+                                        scope.launch {
+                                            if (char == '#') listState.scrollToItem(0)
+                                            else {
+                                                items.indexOfFirst { selector(it).startsWith(char, true) }
+                                                    .takeIf { it > -1 }
+                                                    ?.also { pos -> listState.scrollToItem(pos) }
+                                            }
+                                            selected = char
                                         }
-                                    }
-                                },
-                            contentAlignment = Alignment.Center,
+                                    },
+                                    indication = rememberRipple(bounded = false, radius = (barWidth / 2) + 5.dp),
+                                    interactionSource = remember { MutableInteractionSource() },
+                                ),
                         ) {
-                            Text(
-                                text = char.toString(),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.outline,
-                            )
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                Text(
+                                    text = char.toString(),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.labelSmall,
+                                )
+                            }
                         }
                     }
                 }
