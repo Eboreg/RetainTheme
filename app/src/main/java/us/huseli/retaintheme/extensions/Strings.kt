@@ -25,7 +25,11 @@ fun String.md5(): ByteArray = MessageDigest.getInstance("MD5").digest(toByteArra
 
 fun CharSequence.nullIfBlank(): CharSequence? = takeIf { it.isNotBlank() }
 
+fun String.nullIfBlank(): String? = takeIf { it.isNotBlank() }
+
 fun CharSequence.nullIfEmpty(): CharSequence? = takeIf { it.isNotEmpty() }
+
+fun String.nullIfEmpty(): String? = takeIf { it.isNotEmpty() }
 
 fun CharSequence.parseUrlQuery(): Map<String, String> {
     return split('&')
@@ -36,6 +40,25 @@ fun CharSequence.parseUrlQuery(): Map<String, String> {
 fun CharSequence.sanitizeFilename(): String =
     /** Replaces potentially invalid characters with "-". */
     replace(Regex("[/\\\\?%*:|\"<>\\x7F\\x00-\\x1F]"), "-")
+
+fun Collection<String>.stripCommonFixes(): Collection<String> {
+    /** Strip prefixes and suffixes that are shared among all the strings. */
+    if (size < 2) return this
+
+    val firstReversed = first().reversed()
+    var prefix = ""
+    var suffix = ""
+
+    for (charPos in first().indices) {
+        if (all { it[charPos] == first()[charPos] }) prefix += first()[charPos]
+        else break
+    }
+    for (charPos in firstReversed.indices) {
+        if (all { it.reversed()[charPos] == firstReversed[charPos] }) suffix = firstReversed[charPos] + suffix
+        else break
+    }
+    return map { it.removePrefix(prefix).removeSuffix(suffix) }
+}
 
 fun CharSequence.substringMax(startIndex: Int, endIndex: Int) =
     /**

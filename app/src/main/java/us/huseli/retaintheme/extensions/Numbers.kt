@@ -40,6 +40,8 @@ fun Double.formattedString(maxDecimals: Int, locale: Locale = Locale.getDefault(
     return decimalFormat.format(this).trimEnd('0').trimEnd(symbols.decimalSeparator)
 }
 
+fun Int.pow(n: Int): Int = toDouble().pow(n).toInt()
+
 fun Double.roundUp() = toInt() + (if (this % 1 > 0) 1 else 0)
 
 fun Int.roundUpSqrt() = sqrt().roundUp()
