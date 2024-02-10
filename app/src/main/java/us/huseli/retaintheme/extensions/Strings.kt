@@ -23,13 +23,9 @@ fun Iterable<CharSequence>.leadingChars(): List<Char> =
 
 fun String.md5(): ByteArray = MessageDigest.getInstance("MD5").digest(toByteArray(Charsets.UTF_8))
 
-fun CharSequence.nullIfBlank(): CharSequence? = takeIf { it.isNotBlank() }
+fun CharSequence.nullIfBlank(): String? = takeIf { it.isNotBlank() }?.toString()
 
-fun String.nullIfBlank(): String? = takeIf { it.isNotBlank() }
-
-fun CharSequence.nullIfEmpty(): CharSequence? = takeIf { it.isNotEmpty() }
-
-fun String.nullIfEmpty(): String? = takeIf { it.isNotEmpty() }
+fun CharSequence.nullIfEmpty(): String? = takeIf { it.isNotEmpty() }?.toString()
 
 fun CharSequence.parseUrlQuery(): Map<String, String> {
     return split('&')
