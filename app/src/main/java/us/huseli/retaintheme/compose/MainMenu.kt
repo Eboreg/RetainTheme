@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Suppress("unused")
-class MenuItem<MI : Enum<MI>>(
+open class MenuItem<MI : Enum<MI>>(
     val id: MI,
     val icon: @Composable () -> Unit,
     val description: String? = null,

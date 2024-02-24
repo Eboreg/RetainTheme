@@ -11,6 +11,11 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.core.graphics.scale
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max
 import kotlin.math.min
@@ -56,3 +61,9 @@ fun Bitmap.square(): Bitmap {
 }
 
 fun File.toBitmap(): Bitmap? = takeIf { it.isFile }?.inputStream().use { BitmapFactory.decodeStream(it) }
+
+fun ViewModel.launchOnIOThread(block: suspend CoroutineScope.() -> Unit) =
+    viewModelScope.launch(Dispatchers.IO, block = block)
+
+fun ViewModel.launchOnMainThread(block: suspend CoroutineScope.() -> Unit) =
+    viewModelScope.launch(Dispatchers.Main, block = block)
