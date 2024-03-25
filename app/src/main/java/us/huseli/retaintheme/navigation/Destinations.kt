@@ -7,7 +7,7 @@ import androidx.navigation.NamedNavArgument
 abstract class AbstractDestination<MI : Enum<MI>> {
     abstract val routeTemplate: String
     abstract val arguments: List<NamedNavArgument>
-    abstract val menuItemId: MI?
+    open val menuItemId: MI? = null
 }
 
 abstract class AbstractSimpleDestination<MI : Enum<MI>>(

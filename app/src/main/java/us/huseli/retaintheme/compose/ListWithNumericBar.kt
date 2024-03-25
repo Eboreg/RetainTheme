@@ -73,7 +73,7 @@ inline fun ListWithNumericBar(
                 tempIndices.add(i)
             }
             itemInterval = increment
-            itemIndices = tempIndices.toList().dropLast(1)
+            itemIndices = tempIndices.toList()
         }
     }
 
