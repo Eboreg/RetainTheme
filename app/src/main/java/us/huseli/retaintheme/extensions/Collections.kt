@@ -96,6 +96,17 @@ fun <K, V> Map<out K, V>.mergeWith(other: Map<out K, V>): Map<K, *> {
     return result.toMap()
 }
 
+fun <T> Collection<T>.mostCommonValue(): T? {
+    if (isEmpty()) return null
+
+    val counts = mutableMapOf<T, Int>()
+
+    forEach { value ->
+        counts[value] = (counts[value] ?: 0) + 1
+    }
+    return counts.maxBy { it.value }.key
+}
+
 fun <T> Collection<T>.padEnd(length: Int, value: T? = null): Collection<T?> =
     if (size < length) plus(List(length - size) { value })
     else this
@@ -107,6 +118,41 @@ fun <T> Collection<T>.padStart(length: Int, value: T? = null): Collection<T?> =
 fun <T : Any> Collection<T>.prune(maxLength: Int) =
     if (maxLength < size / 2) includeEveryX((size.toFloat() / maxLength).roundToInt())
     else skipEveryX((size.toFloat() / (size - maxLength)).roundToInt())
+
+fun <T> List<T>.pruneOrPad(length: Int, default: T? = null, average: ((List<T>) -> T)? = null): List<T> {
+    /**
+     * Coerces the list to size 'length' by removing or inserting elements at even intervals as needed.
+     * If 'average' is supplied, it will be used for calculating elements to insert. Otherwise, the previous element
+     * will just be duplicated.
+     *
+     * @param default If supplied and the list is empty, a "length" size list filled with this value is returned.
+     * Otherwise, an empty list will just return an empty list.
+     */
+    if (size == length) return this
+    if (isEmpty()) {
+        return if (default != null) List(length) { default }
+        else this
+    }
+
+    val indexWindows = if (length > size) {
+        val windowSize = (length.toDouble() / size).toInt()
+        val indexCount = length + windowSize - 1
+        val takeEvery = size.toDouble() / indexCount
+        List(indexCount) { (it * takeEvery).toInt() }.windowed(windowSize)
+    } else {
+        val takeEvery = size.toDouble() / length
+        val startIndices = List(length) { (it * takeEvery).toInt() }
+        startIndices.mapIndexed { i, startIdx ->
+            val windowSize = if (i < startIndices.lastIndex) startIndices[i + 1] - startIdx else size - startIdx
+            List(windowSize) { it + startIdx }
+        }
+    }
+
+    return indexWindows.map { window -> average?.invoke(window.map { get(it) }) ?: get(window.average().roundToInt()) }
+}
+
+fun List<Int>.pruneOrPad(length: Int, default: Int = 0) =
+    pruneOrPad(length, default) { sublist -> sublist.average().roundToInt() }
 
 fun <T> List<T>.replace(index: Int, other: Collection<T>): List<T> {
     if (index > size) throw Exception("Index ($index) is larger than size of list ($size)")
@@ -135,6 +181,33 @@ fun <T : Any> Iterable<T>.skipEveryX(x: Int) = filterIndexed { index, _ -> (inde
 fun <T> List<T>.slice(start: Int, maxCount: Int) =
     if (start >= size || maxCount <= 0) emptyList()
     else subList(start, min(start + maxCount, size))
+
+fun Collection<Int>.splitIntervals(descending: Boolean = false): List<Pair<Int, Int>> {
+    /**
+     * Splits collection into list of contiguous intervals and returns pairs of (<start value>, <end value>).
+     *
+     * Example:
+     * listOf(2, 4, 3, 1, 6, 9, 7, 8, 12, 14, 15, 19).splitIntervals() ==
+     *      [(1, 4), (6, 9), (12, 12), (14, 15), (19, 19)]
+     */
+    val intervals = mutableListOf<Pair<Int, Int>>()
+    var currentStartValue: Int = minOrNull() ?: return emptyList()
+    var lastValue: Int? = null
+
+    for ((idx, value) in sorted().withIndex()) {
+        if (lastValue != null && value != lastValue + 1) {
+            intervals.add(Pair(currentStartValue, lastValue))
+            currentStartValue = value
+        }
+        if (idx == size - 1) {
+            intervals.add(Pair(currentStartValue, value))
+        }
+        lastValue = value
+    }
+
+    if (descending) return intervals.toList().sortedByDescending { it.first }
+    return intervals.toList()
+}
 
 inline fun <T> Iterable<T>.sumOfOrNull(selector: (T) -> Long?): Long? {
     /**
