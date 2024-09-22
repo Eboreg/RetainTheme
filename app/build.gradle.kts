@@ -5,7 +5,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "4.5.0"
+val VERSION = "4.5.1"
 
 group = "us.huseli"
 version = VERSION
@@ -46,12 +46,12 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.activity:activity-compose:1.9.2")

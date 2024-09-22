@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.TypedValue
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
@@ -19,17 +18,6 @@ import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
-import kotlin.math.sqrt
-
-fun Color.distance(other: Color): Float {
-    val drp2 = (red - other.red).pow(2)
-    val dgp2 = (green - other.green).pow(2)
-    val dbp2 = (blue - other.blue).pow(2)
-    val t = (red + other.red) / 2
-
-    return sqrt(2 * drp2 + 4 * dgp2 + 3 * dbp2 + t * (drp2 - dbp2) / 256)
-}
 
 fun Context.dpToPx(dp: Number): Int =
     TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp.toFloat(), resources.displayMetrics).toInt()
