@@ -41,16 +41,17 @@ fun Collection<String>.stripCommonFixes(): Collection<String> {
     /** Strip prefixes and suffixes that are shared among all the strings. */
     if (size < 2) return this
 
+    val firstString = first()
     val firstReversed = first().reversed()
     var prefix = ""
     var suffix = ""
 
-    for (charPos in first().indices) {
-        if (all { it[charPos] == first()[charPos] }) prefix += first()[charPos]
+    for (charPos in firstString.indices) {
+        if (all { it.getOrNull(charPos) == firstString[charPos] }) prefix += firstString[charPos]
         else break
     }
     for (charPos in firstReversed.indices) {
-        if (all { it.reversed()[charPos] == firstReversed[charPos] }) suffix = firstReversed[charPos] + suffix
+        if (all { it.reversed().getOrNull(charPos) == firstReversed[charPos] }) suffix = firstReversed[charPos] + suffix
         else break
     }
     return map { it.removePrefix(prefix).removeSuffix(suffix) }

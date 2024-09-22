@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import kotlinx.coroutines.CoroutineScope
@@ -72,7 +73,12 @@ inline fun <T> ListWithAlphabetBar(
                             color = if (char == selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
                             contentColor = if (char == selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.outline,
                             modifier = Modifier
-                                .offset(0.dp, maxHeightDp * (index.toFloat() / displayedCharacters.size))
+                                .offset {
+                                    IntOffset(
+                                        x = 0,
+                                        y = (maxHeightDp * (index.toFloat() / displayedCharacters.size)).roundToPx(),
+                                    )
+                                }
                                 .padding(vertical = 1.dp)
                                 .padding(start = 2.dp)
                                 .size(min(barWidth, 30.dp) - 2.dp)
@@ -88,7 +94,7 @@ inline fun <T> ListWithAlphabetBar(
                                             selected = char
                                         }
                                     },
-                                    indication = rememberRipple(bounded = false, radius = (barWidth / 2) + 5.dp),
+                                    indication = ripple(bounded = false, radius = (barWidth / 2) + 5.dp),
                                     interactionSource = remember { MutableInteractionSource() },
                                 ),
                         ) {

@@ -3,6 +3,7 @@ package us.huseli.retaintheme.snackbar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
 data class SnackbarColors(
@@ -23,6 +24,7 @@ fun infoSnackbarColors() = SnackbarColors(
 )
 
 @Composable
+@ReadOnlyComposable
 fun errorSnackbarColors() = SnackbarColors(
     containerColor = MaterialTheme.colorScheme.errorContainer,
     contentColor = MaterialTheme.colorScheme.onErrorContainer,

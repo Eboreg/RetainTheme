@@ -17,10 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -115,7 +115,7 @@ inline fun ListWithNumericBar(
                                             selected = itemIndex
                                         }
                                     },
-                                    indication = rememberRipple(bounded = false, radius = (barWidth / 2) + 5.dp),
+                                    indication = ripple(bounded = false, radius = (barWidth / 2) + 5.dp),
                                     interactionSource = remember { MutableInteractionSource() },
                                 ),
                         ) {

@@ -62,10 +62,11 @@ fun <T : Any> Iterable<T>.includeEveryX(x: Int) = filterIndexed { index, _ -> in
 fun <K, V> Iterable<Map<K, V>>.join(): Map<K, V> =
     mutableMapOf<K, V>().also { map { map -> it.putAll(map) } }.toMap()
 
-fun <T> List<T>.listItemsBetween(item1: T, item2: T): List<T> {
+fun <T> List<T>.listItemsBetween(item1: T, item2: T, key: (T) -> Any?): List<T> {
     /** from & to are both exclusive */
-    val item1Index = indexOf(item1)
-    val item2Index = indexOf(item2)
+    val keyList = map { key(it) }
+    val item1Index = keyList.indexOf(key(item1))
+    val item2Index = keyList.indexOf(key(item2))
     val fromIndex = min(item1Index, item2Index)
     val toIndex = max(item1Index, item2Index)
 
@@ -75,6 +76,9 @@ fun <T> List<T>.listItemsBetween(item1: T, item2: T): List<T> {
         else -> subList(fromIndex + 1, toIndex)
     }
 }
+
+fun <T> List<T>.listItemsBetween(item1: T, item2: T): List<T> =
+    listItemsBetween(item1 = item1, item2 = item2, key = { it })
 
 fun <K, V> Map<out K, V>.mergeWith(other: Map<out K, V>): Map<K, *> {
     /**
@@ -105,6 +109,14 @@ fun <T> Collection<T>.mostCommonValue(): T? {
         counts[value] = (counts[value] ?: 0) + 1
     }
     return counts.maxBy { it.value }.key
+}
+
+fun <T> List<T>.nextOrFirst(current: T): T {
+    val currentIdx = indexOf(current)
+
+    if (isEmpty()) throw Exception("nextOrFirst() needs at least 1 element")
+    if (currentIdx == -1 || currentIdx == lastIndex) return this[0]
+    return this[currentIdx + 1]
 }
 
 fun <T> Collection<T>.padEnd(length: Int, value: T? = null): Collection<T?> =
@@ -181,6 +193,11 @@ fun <T : Any> Iterable<T>.skipEveryX(x: Int) = filterIndexed { index, _ -> (inde
 fun <T> List<T>.slice(start: Int, maxCount: Int) =
     if (start >= size || maxCount <= 0) emptyList()
     else subList(start, min(start + maxCount, size))
+
+fun <T, K> Iterable<T>.sortedLike(other: Iterable<T>, key: (T) -> K): List<T> =
+    sortedBy { item -> other.indexOfFirst { key(it) == key(item) } }
+
+fun <T> Iterable<T>.sortedLike(other: Iterable<T>) = sortedLike(other, key = { it })
 
 fun Collection<Int>.splitIntervals(descending: Boolean = false): List<Pair<Int, Int>> {
     /**
