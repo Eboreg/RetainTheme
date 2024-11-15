@@ -3,6 +3,21 @@ package us.huseli.retaintheme.utils
 import android.util.Log
 import us.huseli.retaintheme.snackbar.SnackbarEngine
 
+data class LogInstance(
+    val priority: Int,
+    val tag: String,
+    val message: String? = null,
+    val exception: Throwable? = null,
+    val force: Boolean = false,
+    val showSnackbar: Boolean = false,
+) {
+    val exceptionString: String?
+        get() = exception?.message ?: exception?.toString()
+
+    val snackbarMessage: String?
+        get() = if (showSnackbar) message ?: exceptionString else null
+}
+
 @Suppress("unused")
 interface ILogger {
     private fun formatMessage(message: String): String = "[${getThreadSignature()}] $message"
@@ -14,13 +29,21 @@ interface ILogger {
         return thread.threadGroup?.name?.let { "$ret:$it" } ?: ret
     }
 
-    fun logImpl(
-        priority: Int,
-        tag: String? = null,
-        message: String? = null,
-        force: Boolean = false,
-        exception: Throwable? = null,
-    )
+    fun shouldLog(log: LogInstance): Boolean
+
+    fun log(log: LogInstance) {
+        val logMessage = log.message?.let { formatMessage(log.message) } ?: log.exceptionString
+
+        if (log.force || shouldLog(log)) {
+            if (log.priority >= Log.ERROR) Log.e(log.tag, logMessage, log.exception)
+            else if (log.priority == Log.WARN) Log.w(log.tag, logMessage, log.exception)
+            else Log.i(log.tag, logMessage, log.exception)
+        }
+        log.snackbarMessage?.also {
+            if (log.priority <= Log.WARN) SnackbarEngine.addInfo(message = it)
+            else SnackbarEngine.addError(message = it)
+        }
+    }
 
     fun log(
         message: String? = null,
@@ -29,22 +52,16 @@ interface ILogger {
         force: Boolean = false,
         showSnackbar: Boolean = false,
         exception: Throwable? = null,
-    ) {
-        val logMessage = message?.let { formatMessage(message) } ?: exception?.message ?: exception?.toString()
-        val snackbarMessage = message ?: exception?.message ?: exception?.toString()
-
-        logImpl(
-            priority = priority,
-            tag = tag,
-            message = logMessage,
-            force = force,
+    ) = log(
+        LogInstance(
             exception = exception,
+            force = force,
+            message = message,
+            priority = priority,
+            showSnackbar = showSnackbar,
+            tag = tag,
         )
-        if (showSnackbar && snackbarMessage != null) {
-            if (priority <= 5) SnackbarEngine.addInfo(message = snackbarMessage)
-            else SnackbarEngine.addError(message = snackbarMessage)
-        }
-    }
+    )
 
     fun logError(
         message: String? = null,
@@ -53,12 +70,14 @@ interface ILogger {
         force: Boolean = false,
         showSnackbar: Boolean = false
     ) = log(
-        priority = Log.ERROR,
-        tag = tag,
-        message = message,
-        exception = exception,
-        showSnackbar = showSnackbar,
-        force = force,
+        LogInstance(
+            exception = exception,
+            force = force,
+            message = message,
+            priority = Log.ERROR,
+            showSnackbar = showSnackbar,
+            tag = tag,
+        )
     )
 
     fun logWarning(
@@ -68,17 +87,13 @@ interface ILogger {
         force: Boolean = false,
         showSnackbar: Boolean = false,
     ) = log(
-        priority = Log.WARN,
-        tag = tag,
-        message = message,
-        exception = exception,
-        showSnackbar = showSnackbar,
-        force = force,
+        LogInstance(
+            exception = exception,
+            force = force,
+            message = message,
+            priority = Log.WARN,
+            showSnackbar = showSnackbar,
+            tag = tag,
+        )
     )
-
-    fun showErrorSnackbar(message: String) = logError(message = message, showSnackbar = true)
-
-    fun showErrorSnackbar(exception: Throwable) = logError(exception = exception, showSnackbar = true)
-
-    fun showInfoSnackbar(message: String) = log(message = message, showSnackbar = true)
 }
