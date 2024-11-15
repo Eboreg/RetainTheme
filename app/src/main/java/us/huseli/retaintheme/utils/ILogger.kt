@@ -14,45 +14,71 @@ interface ILogger {
         return thread.threadGroup?.name?.let { "$ret:$it" } ?: ret
     }
 
-    fun log(priority: Int, tag: String, message: String, force: Boolean = false) {
-        Log.println(priority, tag, formatMessage(message))
+    fun logImpl(
+        priority: Int,
+        tag: String? = null,
+        message: String? = null,
+        force: Boolean = false,
+        exception: Throwable? = null,
+    )
+
+    fun log(
+        message: String? = null,
+        priority: Int = Log.INFO,
+        tag: String = javaClass.simpleName,
+        force: Boolean = false,
+        showSnackbar: Boolean = false,
+        exception: Throwable? = null,
+    ) {
+        val logMessage = message?.let { formatMessage(message) } ?: exception?.message ?: exception?.toString()
+        val snackbarMessage = message ?: exception?.message ?: exception?.toString()
+
+        logImpl(
+            priority = priority,
+            tag = tag,
+            message = logMessage,
+            force = force,
+            exception = exception,
+        )
+        if (showSnackbar && snackbarMessage != null) {
+            if (priority <= 5) SnackbarEngine.addInfo(message = snackbarMessage)
+            else SnackbarEngine.addError(message = snackbarMessage)
+        }
     }
 
-    fun log(priority: Int, message: String, force: Boolean = false) =
-        log(priority = priority, tag = javaClass.simpleName, message = message, force = force)
+    fun logError(
+        message: String? = null,
+        exception: Throwable? = null,
+        tag: String = javaClass.simpleName,
+        force: Boolean = false,
+        showSnackbar: Boolean = false
+    ) = log(
+        priority = Log.ERROR,
+        tag = tag,
+        message = message,
+        exception = exception,
+        showSnackbar = showSnackbar,
+        force = force,
+    )
 
-    fun log(tag: String, message: String, force: Boolean = false) =
-        log(priority = Log.INFO, tag = tag, message = message, force = force)
+    fun logWarning(
+        message: String? = null,
+        exception: Throwable? = null,
+        tag: String = javaClass.simpleName,
+        force: Boolean = false,
+        showSnackbar: Boolean = false,
+    ) = log(
+        priority = Log.WARN,
+        tag = tag,
+        message = message,
+        exception = exception,
+        showSnackbar = showSnackbar,
+        force = force,
+    )
 
-    fun log(message: String, force: Boolean = false) =
-        log(priority = Log.INFO, tag = javaClass.simpleName, message = message, force = force)
+    fun showErrorSnackbar(message: String) = logError(message = message, showSnackbar = true)
 
-    fun logError(tag: String, message: String, exception: Throwable? = null) {
-        Log.e(tag, formatMessage(message), exception)
-    }
+    fun showErrorSnackbar(exception: Throwable) = logError(exception = exception, showSnackbar = true)
 
-    fun logError(message: String, exception: Throwable? = null) =
-        logError(tag = javaClass.simpleName, message = message, exception = exception)
-
-    fun logError(exception: Throwable) =
-        logError(message = exception.toString(), exception = exception, tag = javaClass.simpleName)
-
-    fun logWarning(tag: String, message: String, exception: Throwable? = null) {
-        Log.w(tag, formatMessage(message), exception)
-    }
-
-    fun logWarning(message: String, exception: Throwable? = null) =
-        logWarning(tag = javaClass.simpleName, message = message, exception = exception)
-
-    fun showErrorSnackbar(message: String) {
-        logError(message)
-        SnackbarEngine.addError(message = message)
-    }
-
-    fun showErrorSnackbar(exception: Throwable) {
-        logError(exception)
-        SnackbarEngine.addError(message = exception.message ?: exception.toString())
-    }
-
-    fun showInfoSnackbar(message: String) = SnackbarEngine.addInfo(message = message)
+    fun showInfoSnackbar(message: String) = log(message = message, showSnackbar = true)
 }
