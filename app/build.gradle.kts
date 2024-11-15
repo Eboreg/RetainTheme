@@ -2,10 +2,11 @@ plugins {
     id("com.android.library")
     id("kotlin-android")
     id("maven-publish")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 @Suppress("PropertyName")
-val VERSION = "4.5.1"
+val VERSION = "4.6.0"
 
 group = "us.huseli"
 version = VERSION
@@ -16,7 +17,7 @@ kotlin {
 
 android {
     namespace = "us.huseli.retaintheme"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 21
@@ -45,19 +46,21 @@ android {
         compose = true
     }
 
+    /*
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
     }
+     */
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.activity:activity-compose:1.9.2")
-    implementation(platform("androidx.compose:compose-bom:2024.09.02"))
+    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation(platform("androidx.compose:compose-bom:2024.11.00"))
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.navigation:navigation-common-ktx:2.8.1")
+    implementation("androidx.navigation:navigation-common-ktx:2.8.4")
 }
 
 afterEvaluate {
