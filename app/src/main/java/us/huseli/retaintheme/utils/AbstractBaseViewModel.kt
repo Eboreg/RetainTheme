@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.withContext
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-abstract class AbstractBaseViewModel : ViewModel(), ILogger {
+abstract class AbstractBaseViewModel : ViewModel() {
     protected suspend fun <T> onIOThread(block: suspend CoroutineScope.() -> T) =
         withContext(context = Dispatchers.IO, block = block)
 
@@ -21,8 +21,7 @@ abstract class AbstractBaseViewModel : ViewModel(), ILogger {
     protected fun <T> Flow<T>.stateWhileSubscribed(
         initialValue: T,
         stopTimeoutMillis: Long = 5_000,
-    ): StateFlow<T> =
-        stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis), initialValue)
+    ): StateFlow<T> = stateIn(viewModelScope, SharingStarted.WhileSubscribed(stopTimeoutMillis), initialValue)
 
     protected fun <T> Flow<T>.stateWhileSubscribed(): StateFlow<T?> = stateWhileSubscribed(null)
 
