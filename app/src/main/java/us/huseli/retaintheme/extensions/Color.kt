@@ -2,6 +2,7 @@
 
 package us.huseli.retaintheme.extensions
 
+import android.os.Build
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.graphics.Color
@@ -26,6 +27,7 @@ fun Color.toHexString(withHash: Boolean = false, withAlpha: Boolean = true): Str
 }
 
 fun String.hexCodeToColor(): Color? {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return null
     return try {
         Color(toColorInt())
     } catch (e: Throwable) {

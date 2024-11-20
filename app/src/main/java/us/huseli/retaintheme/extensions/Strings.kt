@@ -78,8 +78,15 @@ fun String.toDuration(): Duration {
     val groups = regex.find(this)?.groups
     var duration = Duration.ZERO
 
+    groups?.get(1)?.value?.toInt()?.hours?.let { duration += it }
+    groups?.get(2)?.value?.toInt()?.minutes?.let { duration += it }
+    groups?.get(3)?.value?.toInt()?.seconds?.let { duration += it }
+
+    // TODO remove when made sure above is working
+    /*
     groups?.get("hours")?.value?.toInt()?.hours?.let { duration += it }
     groups?.get("minutes")?.value?.toInt()?.minutes?.let { duration += it }
     groups?.get("seconds")?.value?.toInt()?.seconds?.let { duration += it }
+     */
     return duration
 }

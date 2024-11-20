@@ -55,7 +55,8 @@ inline fun <T> ListWithAlphabetBar(
     var maxHeightDp by remember { mutableStateOf(0.dp) }
 
     BoxWithConstraints(modifier = modifier) {
-        maxHeightDp = maxHeight
+        maxHeightDp = this.maxHeight
+
         Row {
             Column(modifier = Modifier.weight(1f)) {
                 content()

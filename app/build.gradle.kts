@@ -6,7 +6,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "4.6.3"
+val VERSION = "4.6.4"
 
 group = "us.huseli"
 version = VERSION
@@ -45,12 +45,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-    /*
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
-     */
 }
 
 dependencies {
