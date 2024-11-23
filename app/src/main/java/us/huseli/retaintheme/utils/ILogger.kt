@@ -46,9 +46,9 @@ interface ILogger {
     }
 
     fun log(
-        message: String? = null,
+        tag: String,
+        message: String,
         priority: Int = Log.INFO,
-        tag: String = javaClass.simpleName,
         force: Boolean = false,
         showSnackbar: Boolean = false,
         exception: Throwable? = null,
@@ -63,10 +63,25 @@ interface ILogger {
         )
     )
 
+    fun log(
+        message: String,
+        priority: Int = Log.INFO,
+        force: Boolean = false,
+        showSnackbar: Boolean = false,
+        exception: Throwable? = null,
+    ) = log(
+        exception = exception,
+        force = force,
+        message = message,
+        priority = priority,
+        showSnackbar = showSnackbar,
+        tag = javaClass.simpleName,
+    )
+
     fun logError(
+        tag: String,
         message: String? = null,
         exception: Throwable? = null,
-        tag: String = javaClass.simpleName,
         force: Boolean = false,
         showSnackbar: Boolean = false
     ) = log(
@@ -80,10 +95,23 @@ interface ILogger {
         )
     )
 
-    fun logWarning(
+    fun logError(
         message: String? = null,
         exception: Throwable? = null,
-        tag: String = javaClass.simpleName,
+        force: Boolean = false,
+        showSnackbar: Boolean = false
+    ) = logError(
+        exception = exception,
+        force = force,
+        message = message,
+        showSnackbar = showSnackbar,
+        tag = javaClass.simpleName,
+    )
+
+    fun logWarning(
+        tag: String,
+        message: String? = null,
+        exception: Throwable? = null,
         force: Boolean = false,
         showSnackbar: Boolean = false,
     ) = log(
@@ -95,5 +123,18 @@ interface ILogger {
             showSnackbar = showSnackbar,
             tag = tag,
         )
+    )
+
+    fun logWarning(
+        message: String? = null,
+        exception: Throwable? = null,
+        force: Boolean = false,
+        showSnackbar: Boolean = false,
+    ) = logWarning(
+        exception = exception,
+        force = force,
+        message = message,
+        showSnackbar = showSnackbar,
+        tag = javaClass.simpleName,
     )
 }
