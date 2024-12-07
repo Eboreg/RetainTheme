@@ -35,9 +35,14 @@ interface ILogger {
         val logMessage = log.message?.let { formatMessage(log.message) } ?: log.exceptionString
 
         if (log.force || shouldLog(log)) {
-            if (log.priority >= Log.ERROR) Log.e(log.tag, logMessage, log.exception)
-            else if (log.priority == Log.WARN) Log.w(log.tag, logMessage, log.exception)
-            else Log.i(log.tag, logMessage, log.exception)
+            when (log.priority) {
+                Log.ASSERT -> Log.wtf(log.tag, logMessage, log.exception)
+                Log.ERROR -> Log.e(log.tag, logMessage, log.exception)
+                Log.WARN -> Log.w(log.tag, logMessage, log.exception)
+                Log.DEBUG -> Log.d(log.tag, logMessage, log.exception)
+                Log.VERBOSE -> Log.v(log.tag, logMessage, log.exception)
+                else -> Log.i(log.tag, logMessage, log.exception)
+            }
         }
         log.snackbarMessage?.also {
             if (log.priority <= Log.WARN) SnackbarEngine.addInfo(message = it)
