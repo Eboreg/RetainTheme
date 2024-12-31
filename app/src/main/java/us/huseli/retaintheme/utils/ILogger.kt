@@ -29,7 +29,7 @@ interface ILogger {
         return thread.threadGroup?.name?.let { "$ret:$it" } ?: ret
     }
 
-    fun shouldLog(log: LogInstance): Boolean
+    fun shouldLog(log: LogInstance): Boolean = true
 
     fun log(log: LogInstance) {
         val logMessage = log.message?.let { formatMessage(log.message) } ?: log.exceptionString

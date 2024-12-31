@@ -2,6 +2,7 @@
 
 package us.huseli.retaintheme.extensions
 
+import us.huseli.retaintheme.Difference
 import java.security.MessageDigest
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -11,6 +12,23 @@ import kotlin.time.Duration.Companion.seconds
 fun CharSequence.capitalized() = replace(Regex("((^\\p{L})|(?<=\\P{L})(\\p{L}))")) { it.value.uppercase() }
 
 fun CharSequence.containsAny(terms: Iterable<CharSequence>): Boolean = terms.any { contains(it) }
+
+fun String.diff(other: String?): Difference {
+    val thisFinishedWords = finishedWords()
+    val otherFinishedWords = other?.finishedWords() ?: emptyList()
+
+    return when {
+        this == other -> Difference.None
+        other == null -> Difference.Significant
+        thisFinishedWords != otherFinishedWords -> Difference.Significant
+        else -> Difference.Small
+    }
+}
+
+fun String.finishedWords() = replace(Regex("^\\s*"), "")
+    .split(Regex("\\s+"))
+    .let { if (matches(Regex(".*\\w$"))) it.dropLast(1) else it }
+    .filter { it.isNotEmpty() }
 
 fun Iterable<CharSequence>.leadingChars(): List<Char> =
     /**

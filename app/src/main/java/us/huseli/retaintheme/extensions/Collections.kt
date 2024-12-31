@@ -2,6 +2,7 @@
 
 package us.huseli.retaintheme.extensions
 
+import androidx.compose.ui.text.AnnotatedString
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -61,6 +62,12 @@ fun <T : Any> Iterable<T>.includeEveryX(x: Int) = filterIndexed { index, _ -> in
 
 fun <K, V> Iterable<Map<K, V>>.join(): Map<K, V> =
     mutableMapOf<K, V>().also { map { map -> it.putAll(map) } }.toMap()
+
+fun <T> List<AnnotatedString.Range<T>>.limit(length: Int): List<AnnotatedString.Range<T>> =
+    filter { it.start < length }.map { range ->
+        if (range.end <= length) range
+        else range.copy(end = length)
+    }
 
 fun <T> List<T>.listItemsBetween(item1: T, item2: T, key: (T) -> Any?): List<T> {
     /** from & to are both exclusive */
