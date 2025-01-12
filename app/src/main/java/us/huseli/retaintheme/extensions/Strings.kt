@@ -82,6 +82,10 @@ fun CharSequence.substringMax(startIndex: Int, endIndex: Int) =
      */
     substring(startIndex, kotlin.math.min(endIndex, length))
 
+fun String.takeIfNotBlank() = takeIf { it.isNotBlank() }
+
+fun String.takeIfNotEmpty() = takeIf { it.isNotEmpty() }
+
 fun String.toDuration(): Duration {
     /**
      * Parses a time string that can either be in ISO-8601 or "HH:mm:ss"

@@ -19,6 +19,9 @@ fun <T> List<T>.circular(offset: Int, length: Int): List<T> {
     return subList(realOffset, realOffset + length)
 }
 
+fun Collection<String>.cleanDuplicates(ignoreCase: Boolean = true): Collection<String> =
+    associateBy { if (ignoreCase) it.lowercase() else it }.values
+
 fun <T> Iterable<T>.clone(): MutableList<T> = mutableListOf<T>().also { it.addAll(this) }
 
 inline fun <T> Iterable<T>.combineEquals(predicate: (a: T, b: T) -> Boolean): List<List<T>> {
@@ -55,9 +58,6 @@ inline fun <S, T : S, K> Iterable<T>.distinctWith(operation: (acc: S, T) -> S, s
     return result.values.toList()
 }
 
-@Suppress("UNCHECKED_CAST")
-fun <K, V : Any> Map<K, V?>.filterValuesNotNull(): Map<K, V> = filterValues { it != null } as Map<K, V>
-
 fun <T : Any> Iterable<T>.includeEveryX(x: Int) = filterIndexed { index, _ -> index % x == 0 }
 
 fun <K, V> Iterable<Map<K, V>>.join(): Map<K, V> =
@@ -86,26 +86,6 @@ fun <T> List<T>.listItemsBetween(item1: T, item2: T, key: (T) -> Any?): List<T> 
 
 fun <T> List<T>.listItemsBetween(item1: T, item2: T): List<T> =
     listItemsBetween(item1 = item1, item2 = item2, key = { it })
-
-fun <K, V> Map<out K, V>.mergeWith(other: Map<out K, V>): Map<K, *> {
-    /**
-     * Merges with `other` recursively. Example:
-     * val map1 = mapOf("key1" to mapOf("key1.1" to "value1.1", "key1.2" to "value1.2"), "key2" to "value2")
-     * val map2 = mapOf("key1" to mapOf("key1.1" to "valueA"), "key3" to "value3")
-     * map1.mergeWith(map2) = {"key1": {"key1.1": "valueA", "key1.2": "value1.2"}, "key2": "value2", "key3": "value3"}
-     */
-    val result: MutableMap<K, Any?> = this.toMutableMap()
-
-    other.forEach { (key, value) ->
-        val ownValue = this[key]
-
-        if (ownValue is Map<*, *> && value is Map<*, *>) {
-            result[key] = ownValue.mergeWith(value)
-        } else result[key] = value
-    }
-
-    return result.toMap()
-}
 
 fun <T> Collection<T>.mostCommonValue(): T? {
     if (isEmpty()) return null
@@ -246,6 +226,12 @@ inline fun <T> Iterable<T>.sumOfOrNull(selector: (T) -> Long?): Long? {
     }
     return sum
 }
+
+fun <T> Set<T>.takeIfNotEmpty() = takeIf { it.isNotEmpty() }
+
+fun <T> List<T>.takeIfNotEmpty() = takeIf { it.isNotEmpty() }
+
+fun <T> Collection<T>.takeIfNotEmpty() = takeIf { it.isNotEmpty() }
 
 inline fun <T, O> Iterable<T>.zipBy(other: Iterable<O>, predicate: (a: T, b: O) -> Boolean): List<Pair<T, O>> =
     /** Combines two lists based on a per-element comparison function. */

@@ -9,7 +9,10 @@ import androidx.annotation.RequiresApi
 import java.time.Instant
 import java.util.Locale
 import kotlin.math.pow
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @RequiresApi(Build.VERSION_CODES.N)
 fun Long.bytesToString(): String {
@@ -40,11 +43,23 @@ fun Double.formattedString(maxDecimals: Int, locale: Locale = Locale.getDefault(
     return decimalFormat.format(this).trimEnd('0').trimEnd(symbols.decimalSeparator)
 }
 
+val Int.hours: Duration
+    get() = toDuration(DurationUnit.HOURS)
+
+val Int.milliseconds: Duration
+    get() = toDuration(DurationUnit.MILLISECONDS)
+
+val Int.minutes: Duration
+    get() = toDuration(DurationUnit.MINUTES)
+
 fun Int.pow(n: Int): Int = toDouble().pow(n).toInt()
 
 fun Double.roundUp() = toInt() + (if (this % 1 > 0) 1 else 0)
 
 fun Int.roundUpSqrt() = sqrt().roundUp()
+
+val Int.seconds: Duration
+    get() = toDuration(DurationUnit.SECONDS)
 
 fun Int.sqrt() = kotlin.math.sqrt(toDouble())
 

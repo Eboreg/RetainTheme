@@ -105,7 +105,7 @@ class Request(
                 message += ", ${receivedBytes}B ($kbps KB/s)"
             }
 
-            log("Request", message)
+            log("Request", message, priority = Log.DEBUG)
         }
     }
 
@@ -175,14 +175,13 @@ class Request(
             headers: Map<String, String> = emptyMap(),
             json: Any,
             gson: Gson = Request.gson,
-        ) =
-            Request(
-                url = url,
-                params = params,
-                headers = headers.plus("Content-Type" to "application/json"),
-                body = gson.toJson(json),
-                method = Method.POST,
-            )
+        ) = Request(
+            url = url,
+            params = params,
+            headers = headers.plus("Content-Type" to "application/json"),
+            body = gson.toJson(json),
+            method = Method.POST,
+        )
 
         fun postFormData(url: String, headers: Map<String, String> = emptyMap(), formData: Map<String, String>) =
             Request(
