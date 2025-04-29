@@ -4,7 +4,7 @@ package us.huseli.retaintheme.compose
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonColors
@@ -27,11 +27,11 @@ fun SmallOutlinedButton(
     onClick: () -> Unit,
     height: Dp = 25.dp,
     enabled: Boolean = true,
-    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
     content: @Composable RowScope.() -> Unit,
 ) {
     OutlinedButton(
-        modifier = modifier.height(height),
+        modifier = modifier.heightIn(min = height),
         onClick = onClick,
         shape = ShapeDefaults.ExtraSmall,
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
@@ -50,7 +50,7 @@ fun SmallOutlinedButton(
     height: Dp = 25.dp,
     textStyle: TextStyle = MaterialTheme.typography.bodySmall,
     enabled: Boolean = true,
-    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onSurface),
+    colors: ButtonColors = ButtonDefaults.outlinedButtonColors(),
 ) {
     SmallOutlinedButton(
         modifier = modifier,
