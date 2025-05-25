@@ -41,8 +41,8 @@ val ColorSaver: Saver<Color, *> = listSaver(
 )
 
 fun randomColor() = Color(
-    red = Random.nextInt(0, 255),
-    green = Random.nextInt(0, 255),
-    blue = Random.nextInt(0, 255),
+    red = Random.nextInt(0, 256),
+    green = Random.nextInt(0, 256),
+    blue = Random.nextInt(0, 256),
     alpha = 255,
 )

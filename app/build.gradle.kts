@@ -6,7 +6,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "4.10.0"
+val VERSION = "4.10.1"
 
 group = "us.huseli"
 version = VERSION
@@ -56,9 +56,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.activity:activity-compose:1.10.1")
-    implementation(platform("androidx.compose:compose-bom:2025.04.01"))
+    implementation(platform("androidx.compose:compose-bom:2025.05.01"))
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.navigation:navigation-common-ktx:2.8.9")
+    implementation("androidx.navigation:navigation-common-ktx:2.9.0")
     // Gson:
     implementation("com.google.code.gson:gson:2.13.1")
     // Text diff:
