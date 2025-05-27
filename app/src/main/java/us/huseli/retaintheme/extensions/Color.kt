@@ -40,7 +40,7 @@ val ColorSaver: Saver<Color, *> = listSaver(
     restore = { Color(red = it[0], green = it[1], blue = it[2], alpha = it[3]) },
 )
 
-fun randomColor() = Color(
+fun Color.Companion.random() = Color(
     red = Random.nextInt(0, 256),
     green = Random.nextInt(0, 256),
     blue = Random.nextInt(0, 256),
