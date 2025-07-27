@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("com.android.library")
     id("kotlin-android")
@@ -6,7 +8,7 @@ plugins {
 }
 
 @Suppress("PropertyName")
-val VERSION = "4.11.0"
+val VERSION = "4.12.0"
 
 group = "us.huseli"
 version = VERSION
@@ -17,7 +19,7 @@ kotlin {
 
 android {
     namespace = "us.huseli.retaintheme"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         minSdk = 21
@@ -38,8 +40,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
 
     buildFeatures {
@@ -52,17 +56,17 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.20")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.activity:activity-compose:1.10.1")
-    implementation(platform("androidx.compose:compose-bom:2025.05.01"))
+    implementation(platform("androidx.compose:compose-bom:2025.07.00"))
     implementation("androidx.compose.material3:material3")
-    implementation("androidx.navigation:navigation-common-ktx:2.9.0")
+    implementation("androidx.navigation:navigation-common-ktx:2.9.2")
     // Gson:
     implementation("com.google.code.gson:gson:2.13.1")
     // Text diff:
-    implementation("io.github.java-diff-utils:java-diff-utils:4.15")
+    implementation("io.github.java-diff-utils:java-diff-utils:4.16")
 }
 
 afterEvaluate {
