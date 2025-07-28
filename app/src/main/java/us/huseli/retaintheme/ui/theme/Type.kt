@@ -1,34 +1,21 @@
 package us.huseli.retaintheme.ui.theme
 
-import androidx.compose.material3.Typography
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+@Immutable
+data class BodyTextStyles(
+    val primary: TextStyle = TextStyle.Default,
+    val primaryBold: TextStyle = TextStyle.Default,
+    val primarySmall: TextStyle = TextStyle.Default,
+    val primarySmallBold: TextStyle = TextStyle.Default,
+    val primaryExtraSmall: TextStyle = TextStyle.Default,
+    val secondary: TextStyle = TextStyle.Default,
+    val secondaryBold: TextStyle = TextStyle.Default,
+    val secondarySmall: TextStyle = TextStyle.Default,
+    val secondarySmallBold: TextStyle = TextStyle.Default,
+    val secondaryExtraSmall: TextStyle = TextStyle.Default,
 )
+
+val LocalBodyTextStyles = staticCompositionLocalOf { BodyTextStyles() }

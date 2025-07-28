@@ -94,7 +94,7 @@ val LightColors = lightColorScheme(
     onSurface = Color(0xFF191C1D),
     onSurfaceVariant = Color(0xFF3F484A),
     onTertiary = Color(0xFFFFFFFF),
-    onTertiaryContainer = Color(0xFF171E00),
+    onTertiaryContainer = Color(0xFF1E1700),
     outline = Color(0xFF6F797A),
     outlineVariant = Color(0xFFBFC8CA),
     primary = Color(0xFF00658F),
@@ -105,8 +105,8 @@ val LightColors = lightColorScheme(
     surface = Color(0xFFF8FAFA),
     surfaceTint = Color(0xFF00658F),
     surfaceVariant = Color(0xFFDBE4E6),
-    tertiary = Color(0xFF526600),
-    tertiaryContainer = Color(0xFFD4ED7F),
+    tertiary = Color(0xFF711313),
+    tertiaryContainer = Color(0xFFFFA3A3),
 )
 
 val DarkColors = darkColorScheme(
@@ -125,8 +125,8 @@ val DarkColors = darkColorScheme(
     onSecondaryContainer = Color(0xFFD2E5F5),
     onSurface = Color(0xFFC4C7C7),
     onSurfaceVariant = Color(0xFF848787),
-    onTertiary = Color(0xFF293500),
-    onTertiaryContainer = Color(0xFFD4ED7F),
+    onTertiary = Color(0xFF352900),
+    onTertiaryContainer = Color(0xFFEDD47F),
     outline = Color(0xFF899294),
     outlineVariant = Color(0xFF3F484A),
     primary = Color(0xFF85CFFF),
@@ -137,23 +137,23 @@ val DarkColors = darkColorScheme(
     surface = Color(0xFF101415),
     surfaceTint = Color(0xFF85CFFF),
     surfaceVariant = Color(0xFF3F484A),
-    tertiary = Color(0xFFB8D166),
-    tertiaryContainer = Color(0xFF3D4D00),
+    tertiary = Color(0xFFFF5656),
+    tertiaryContainer = Color(0xFF710000),
 )
 
 @Composable
 fun getColorScheme(
     lightColors: ColorScheme = LightColors,
     darkColors: ColorScheme = DarkColors,
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
 ): ColorScheme {
     return when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (useDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        useDarkTheme -> darkColors
+        darkTheme -> darkColors
         else -> lightColors
     }
 }
