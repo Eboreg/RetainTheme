@@ -10,7 +10,6 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import us.huseli.retaintheme.RetainConnectionError
 import us.huseli.retaintheme.RetainHttpError
-import us.huseli.retaintheme.utils.AbstractScopeHolder
 import us.huseli.retaintheme.utils.ILogger
 import us.huseli.retaintheme.utils.LogInstance
 import java.io.InputStream
@@ -31,7 +30,7 @@ class Request(
     private val connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT,
     private val readTimeout: Int = DEFAULT_READ_TIMEOUT,
     private val suppressLogs: Boolean = false,
-) : ILogger, AbstractScopeHolder() {
+) : ILogger {
     enum class Method(val value: String) { GET("GET"), POST("POST") }
 
     private var requestStart: Long? = null
@@ -109,53 +108,45 @@ class Request(
         }
     }
 
-    suspend fun getBitmap(): Bitmap? = onIOThread {
-        getInputStream().use { BitmapFactory.decodeStream(it) }.also { finish() }
-    }
+    fun getBitmap(): Bitmap? = getInputStream().use { BitmapFactory.decodeStream(it) }.also { finish() }
 
-    suspend fun getInputStream(): InputStream = onIOThread {
+    fun getInputStream(): InputStream {
         val conn = connect()
         val isGzipped = conn.headerFields["Content-Encoding"]?.contains("gzip") == true
 
-        if (isGzipped) GZIPInputStream(conn.inputStream) else conn.inputStream
+        return if (isGzipped) GZIPInputStream(conn.inputStream) else conn.inputStream
     }
 
-    suspend fun getJsonArray(gson: Gson = Request.gson): List<*> = onIOThread {
-        getInputStream().use {
-            gson.fromJson(it.bufferedReader(), jsonArrayResponseType) ?: emptyList<Any>()
-        }.also { finish() }
-    }
+    fun getJsonArray(gson: Gson = Request.gson): List<*> = getInputStream().use {
+        gson.fromJson(it.bufferedReader(), jsonArrayResponseType) ?: emptyList<Any>()
+    }.also { finish() }
 
-    suspend fun getJsonObject(gson: Gson = Request.gson): Map<String, *> = onIOThread {
-        getInputStream().use {
-            gson.fromJson(it.bufferedReader(), jsonObjectResponseType) ?: emptyMap<String, Any>()
-        }.also { finish() }
-    }
+    fun getJsonObject(gson: Gson = Request.gson): Map<String, *> = getInputStream().use {
+        gson.fromJson(it.bufferedReader(), jsonObjectResponseType) ?: emptyMap<String, Any>()
+    }.also { finish() }
 
-    suspend inline fun <reified T> getObject(gson: Gson = Request.gson): T = onIOThread {
+    inline fun <reified T> getObject(gson: Gson = Request.gson): T =
         getInputStream().use { gson.fromJson(it.bufferedReader(), T::class.java) }.also { finish() }
-    }
 
-    suspend fun <T> getObject(typeOfT: Type, gson: Gson = Request.gson): T = onIOThread {
+    fun <T> getObject(typeOfT: Type, gson: Gson = Request.gson): T =
         getInputStream().use { gson.fromJson<T>(it.bufferedReader(), typeOfT) }.also { finish() }
-    }
 
-    suspend inline fun <reified T> getObjectOrNull(gson: Gson = Request.gson): T? = try {
+    inline fun <reified T> getObjectOrNull(gson: Gson = Request.gson): T? = try {
         getObject<T>(gson)
     } catch (e: Throwable) {
         logError("getObjectOrNull(): $method $url", e)
         null
     }
 
-    suspend fun <T> getObjectOrNull(typeOfT: Type, gson: Gson = Request.gson): T? = try {
+    fun <T> getObjectOrNull(typeOfT: Type, gson: Gson = Request.gson): T? = try {
         getObject<T>(typeOfT, gson)
     } catch (e: Throwable) {
         logError("getObjectOrNull(): $method $url", e)
         null
     }
 
-    suspend fun getString(): String =
-        onIOThread { getInputStream().use { it.bufferedReader().readText() }.also { finish(it.length) } }
+    fun getString(): String =
+        getInputStream().use { it.bufferedReader().readText() }.also { finish(it.length) }
 
     companion object {
         const val DEFAULT_CONNECT_TIMEOUT = 4_050
