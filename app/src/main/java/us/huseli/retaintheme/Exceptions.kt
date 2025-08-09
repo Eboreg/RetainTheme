@@ -2,6 +2,7 @@
 
 package us.huseli.retaintheme
 
+import android.net.Uri
 import us.huseli.retaintheme.request.Request
 
 open class RetainError(cause: Throwable? = null, message: String? = cause?.message) : Exception(message, cause) {
@@ -9,16 +10,16 @@ open class RetainError(cause: Throwable? = null, message: String? = cause?.messa
 }
 
 open class RetainConnectionError(
-    val url: String,
+    val uri: Uri,
     val method: Request.Method,
     message: String? = null,
     cause: Throwable? = null,
 ) : RetainError(cause = cause, message = message)
 
 class RetainHttpError(
-    url: String,
+    uri: Uri,
     method: Request.Method,
     val statusCode: Int,
     message: String? = null,
     cause: Throwable? = null,
-) : RetainConnectionError(url = url, method = method, message = message, cause = cause)
+) : RetainConnectionError(uri = uri, method = method, message = message, cause = cause)
