@@ -12,6 +12,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import us.huseli.retaintheme.RetainConnectionError
 import us.huseli.retaintheme.RetainHttpError
+import us.huseli.retaintheme.extensions.appendQuery
 import us.huseli.retaintheme.utils.ILogger
 import us.huseli.retaintheme.utils.LogInstance
 import java.io.InputStream
@@ -24,7 +25,8 @@ import kotlin.math.roundToInt
 import kotlin.text.Charsets.UTF_8
 
 class Request(
-    val uri: Uri,
+    uri: Uri,
+    query: Map<String, String> = emptyMap(),
     private val headers: Map<String, String> = emptyMap(),
     val method: Method = Method.GET,
     private val body: String? = null,
@@ -54,6 +56,8 @@ class Request(
     enum class Method(val value: String) { GET("GET"), POST("POST") }
 
     private var requestStart: Long? = null
+
+    val uri: Uri = if (query.isNotEmpty()) constructUri(uri = uri, query = query) else uri
 
     @Deprecated("Use uri instead.")
     val url = uri.toString()
@@ -186,14 +190,13 @@ class Request(
         val jsonObjectResponseType = object : TypeToken<Map<String, *>>() {}
         val jsonArrayResponseType = object : TypeToken<List<*>>() {}
 
-        fun constructUri(url: String, params: Map<String, String> = emptyMap()): Uri {
-            val path = url.substringBefore('?')
-            val query = url.substringAfter('?', "")
+        fun constructUri(url: String, query: Map<String, String> = emptyMap()): Uri = Uri.Builder()
+            .encodedPath(url.substringBefore('?'))
+            .encodedQuery(url.substringAfter('?', ""))
+            .appendQuery(query).build()
 
-            return Uri.Builder().encodedPath(path).encodedQuery(query).apply {
-                for ((key, value) in params) appendQueryParameter(key, value)
-            }.build()
-        }
+        fun constructUri(uri: Uri, query: Map<String, String> = emptyMap()): Uri =
+            constructUri(url = uri.toString(), query = query)
 
         @Deprecated("Use constructUri instead.")
         fun constructUrl(url: String, params: Map<String, String> = emptyMap()) =

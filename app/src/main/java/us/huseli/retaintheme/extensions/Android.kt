@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.TypedValue
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
@@ -56,6 +57,12 @@ fun Modifier.clickableIfNotNull(onClick: (() -> Unit)?) = onClick?.let { clickab
 
 fun <T> Modifier.clickableIfNotNull(onClick: ((T) -> Unit)?, arg: T) =
     onClick?.let { clickable { onClick(arg) } } ?: this
+
+fun Uri.Builder.appendQuery(query: Map<String, String>): Uri.Builder = apply {
+    for ((key, value) in query) appendQueryParameter(key, value)
+}
+
+fun Uri.appendQuery(query: Map<String, String>): Uri = buildUpon().appendQuery(query).build()
 
 fun ViewModel.launchOnIOThread(block: suspend CoroutineScope.() -> Unit) =
     viewModelScope.launch(Dispatchers.IO, block = block)
