@@ -38,8 +38,8 @@ internal fun onTextFieldValueChange(
 @Composable
 fun AnnotatedTextField(
     state: RetainAnnotatedStringState,
-    onValueChange: (RetainMutableAnnotatedString) -> Unit = {},
     modifier: Modifier = Modifier,
+    onValueChange: (RetainMutableAnnotatedString) -> Unit = {},
     cursorBrush: Brush = SolidColor(Color.Black),
     enabled: Boolean = true,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -66,8 +66,8 @@ fun AnnotatedTextField(
 @Composable
 fun OutlinedAnnotatedTextField(
     state: RetainAnnotatedStringState,
-    onValueChange: (RetainMutableAnnotatedString) -> Unit = {},
     modifier: Modifier = Modifier,
+    onValueChange: (RetainMutableAnnotatedString) -> Unit = {},
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
         focusedBorderColor = Color.Transparent,
         unfocusedBorderColor = Color.Transparent,

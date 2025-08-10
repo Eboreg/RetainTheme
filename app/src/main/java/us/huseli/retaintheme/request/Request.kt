@@ -159,21 +159,21 @@ class Request(
     }
 
     class Builder(url: String) {
-        private val _query = mutableMapOf<String, String>()
         private val _headers = mutableMapOf<String, String>()
+        private val _query = mutableMapOf<String, String>()
 
         var body: String? = null
             private set
-        var method: Method = Method.GET
-            private set
         var connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT
             private set
-        var readTimeout: Int = DEFAULT_READ_TIMEOUT
+        val headers: Map<String, String>
+            get() = _headers.toMap()
+        var method: Method = Method.GET
             private set
         val query: Map<String, String>
             get() = _query.toMap()
-        val headers: Map<String, String>
-            get() = _headers.toMap()
+        var readTimeout: Int = DEFAULT_READ_TIMEOUT
+            private set
         var url: String = url
             private set
 
@@ -227,12 +227,22 @@ class Request(
         const val DEFAULT_READ_TIMEOUT = 10_000
 
         val gson: Gson = GsonBuilder().create()
-        val jsonObjectResponseType = object : TypeToken<Map<String, *>>() {}
         val jsonArrayResponseType = object : TypeToken<List<*>>() {}
+        val jsonObjectResponseType = object : TypeToken<Map<String, *>>() {}
 
         fun constructUrl(url: String, params: Map<String, String> = emptyMap()) =
             if (params.isNotEmpty()) encodeQuery(params).let { if (url.contains("?")) "$url&$it" else "$url?$it" }
             else url
+
+        fun postFormData(
+            url: String,
+            headers: Map<String, String> = emptyMap(),
+            formData: Map<String, String>,
+        ): Request = Builder(url)
+            .setHeaders(headers)
+            .setBody(encodeQuery(formData))
+            .setMethod(Method.POST)
+            .build()
 
         fun postJson(
             url: String,
@@ -244,16 +254,6 @@ class Request(
             .setQuery(query)
             .setHeaders(headers.plus("Content-Type" to "application/json"))
             .setBody(gson.toJson(json))
-            .setMethod(Method.POST)
-            .build()
-
-        fun postFormData(
-            url: String,
-            headers: Map<String, String> = emptyMap(),
-            formData: Map<String, String>,
-        ): Request = Builder(url)
-            .setHeaders(headers)
-            .setBody(encodeQuery(formData))
             .setMethod(Method.POST)
             .build()
 

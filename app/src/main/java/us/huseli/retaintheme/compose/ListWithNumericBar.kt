@@ -56,7 +56,6 @@ inline fun ListWithNumericBar(
 ) {
     var maxHeightDp by remember { mutableStateOf(0.dp) }
     var itemIndices by remember { mutableStateOf<List<Int>>(emptyList()) }
-    var itemInterval by remember { mutableIntStateOf(0) }
     val itemsPerScreen by remember(maxHeightDp) {
         mutableStateOf(itemHeight?.let { itemHeight -> (maxHeightDp / itemHeight).toInt().takeIf { it > 0 } })
     }
@@ -72,7 +71,6 @@ inline fun ListWithNumericBar(
             for (i in 0 until listSize step increment) {
                 tempIndices.add(i)
             }
-            itemInterval = increment
             itemIndices = tempIndices.toList()
         }
     }

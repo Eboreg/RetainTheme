@@ -68,7 +68,7 @@ data class RetainSpanStyle(
         get() = if (isUnderlined) TextDecoration.Underline else null
 
     override fun toString(): String {
-        val result = mutableListOf<String>(size.name)
+        val result = mutableListOf(size.name)
 
         if (isBold) result.add("bold")
         if (isItalic) result.add("italic")

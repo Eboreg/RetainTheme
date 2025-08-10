@@ -19,7 +19,7 @@ fun <T> List<T>.circular(offset: Int, length: Int): List<T> {
     return subList(realOffset, realOffset + length)
 }
 
-fun Collection<String>.cleanDuplicates(ignoreCase: Boolean = true): Collection<String> =
+fun Iterable<String>.cleanDuplicates(ignoreCase: Boolean = true): Collection<String> =
     associateBy { if (ignoreCase) it.lowercase() else it }.values
 
 fun <T> Iterable<T>.clone(): MutableList<T> = mutableListOf<T>().also { it.addAll(this) }
@@ -63,7 +63,7 @@ fun <T : Any> Iterable<T>.includeEveryX(x: Int) = filterIndexed { index, _ -> in
 fun <K, V> Iterable<Map<K, V>>.join(): Map<K, V> =
     mutableMapOf<K, V>().also { map { map -> it.putAll(map) } }.toMap()
 
-fun <T> List<AnnotatedString.Range<T>>.limit(length: Int): List<AnnotatedString.Range<T>> =
+fun <T> Iterable<AnnotatedString.Range<T>>.limit(length: Int): List<AnnotatedString.Range<T>> =
     filter { it.start < length }.map { range ->
         if (range.end <= length) range
         else range.copy(end = length)
@@ -87,14 +87,14 @@ fun <T> List<T>.listItemsBetween(item1: T, item2: T, key: (T) -> Any?): List<T> 
 fun <T> List<T>.listItemsBetween(item1: T, item2: T): List<T> =
     listItemsBetween(item1 = item1, item2 = item2, key = { it })
 
-fun <T> Collection<T>.mostCommonValue(): T? {
-    if (isEmpty()) return null
-
+fun <T> Iterable<T>.mostCommonValue(): T? {
     val counts = mutableMapOf<T, Int>()
 
     forEach { value ->
         counts[value] = (counts[value] ?: 0) + 1
     }
+
+    if (counts.isEmpty()) return null
     return counts.maxBy { it.value }.key
 }
 

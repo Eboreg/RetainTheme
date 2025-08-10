@@ -9,6 +9,24 @@ inline fun <reified T> Map<*, *>.filterKeysOfType(): Map<T, *> = filterKeys { it
 fun <K, V : Any> Map<K, V?>.filterValuesNotNull(): Map<K, V> = filterValues { it != null } as Map<K, V>
 
 inline fun <reified T> Map<*, *>.getAll(vararg paths: Any): List<T> {
+    /**
+     * `paths` is typically strings or lists of strings.
+     *
+     * Example maps:
+     * A = {"bar": 123}
+     * B = {"foo": {"bar": 123}}
+     * C = {"foo": {"baz": {"bar": 123}}}
+     *
+     * Example 1: getAll("bar")
+     * Only matches for maps with a "bar" key on level 0, i.e. only map A.
+     *
+     * Example 2: getAll(listOf("*", "bar"))
+     * Matches for maps with any key on level 0 and "bar" on level 1, i.e. only map B.
+     *
+     * Example 3: getAll(listOf("**", "bar"))
+     * "**" traverses any number of levels, so this will match for all maps with a "bar"
+     * key on any level, i.e. all 3 maps above.
+     */
     val result = mutableListOf<T>()
 
     for (pathCandidate in paths) {

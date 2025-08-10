@@ -20,7 +20,7 @@ class StringDiff(oldString: String, newString: String) {
         val newWords = newString.splitWords()
         val newFinishedWords = newString.splitFinishedWords()
         val whiteSpaceAdded =
-            deltas.any { delta -> delta.target?.lines?.any { it.contains(Regex("\\s")) } == true } == true
+            deltas.any { delta -> delta.target?.lines?.any { it.contains(Regex("\\s")) } == true }
 
         wordsChanged = (whiteSpaceAdded && oldFinishedWords != newFinishedWords) || oldWords.size > newWords.size
         added = deltas
