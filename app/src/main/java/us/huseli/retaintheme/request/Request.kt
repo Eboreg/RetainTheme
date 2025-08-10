@@ -158,73 +158,73 @@ class Request(
         return super.shouldLog(log)
     }
 
+    class Builder(url: String) {
+        private val _query = mutableMapOf<String, String>()
+        private val _headers = mutableMapOf<String, String>()
+
+        var body: String? = null
+            private set
+        var method: Method = Method.GET
+            private set
+        var connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT
+            private set
+        var readTimeout: Int = DEFAULT_READ_TIMEOUT
+            private set
+        val query: Map<String, String>
+            get() = _query.toMap()
+        val headers: Map<String, String>
+            get() = _headers.toMap()
+        var url: String = url
+            private set
+
+        init {
+            setUrl(url, true)
+        }
+
+        fun appendHeaders(value: Map<String, String>): Builder = apply { _headers.putAll(value) }
+
+        fun appendQuery(value: Map<String, String>): Builder = apply {
+            _query.putAll(value)
+        }
+
+        fun build(): Request = Request(
+            url = url,
+            query = _query,
+            headers = _headers,
+            method = method,
+            body = body,
+            connectTimeout = connectTimeout,
+            readTimeout = readTimeout,
+        )
+
+        fun setBody(value: String?): Builder = apply { body = value }
+
+        fun setHeaders(value: Map<String, String>): Builder = apply {
+            _headers.clear()
+            _headers.putAll(value)
+        }
+
+        fun setMethod(value: Method): Builder = apply { method = value }
+
+        fun setQuery(value: Map<String, String>): Builder = apply {
+            _query.clear()
+            _query.putAll(value)
+        }
+
+        fun setUrl(value: String, clearQuery: Boolean = false): Builder = apply {
+            val query = value.substringAfter('?', "").split('&').mapNotNull { param ->
+                param.split('=', limit = 2).takeIf { it.size == 2 }?.let { (key, value) -> key to value }
+            }.toMap()
+
+            this.url = value.substringBefore('?')
+            if (clearQuery) setQuery(query)
+            else appendQuery(query)
+        }
+    }
+
     companion object {
         const val DEFAULT_CONNECT_TIMEOUT = 4_050
         const val DEFAULT_READ_TIMEOUT = 10_000
-
-        class Builder(url: String) {
-            private val _query = mutableMapOf<String, String>()
-            private val _headers = mutableMapOf<String, String>()
-
-            var body: String? = null
-                private set
-            var method: Method = Method.GET
-                private set
-            var connectTimeout: Int = DEFAULT_CONNECT_TIMEOUT
-                private set
-            var readTimeout: Int = DEFAULT_READ_TIMEOUT
-                private set
-            val query: Map<String, String>
-                get() = _query.toMap()
-            val headers: Map<String, String>
-                get() = _headers.toMap()
-            var url: String = url
-                private set
-
-            init {
-                setUrl(url, true)
-            }
-
-            fun appendHeaders(value: Map<String, String>): Builder = apply { _headers.putAll(value) }
-
-            fun appendQuery(value: Map<String, String>): Builder = apply {
-                _query.putAll(value)
-            }
-
-            fun build(): Request = Request(
-                url = url,
-                query = _query,
-                headers = _headers,
-                method = method,
-                body = body,
-                connectTimeout = connectTimeout,
-                readTimeout = readTimeout,
-            )
-
-            fun setBody(value: String?): Builder = apply { body = value }
-
-            fun setHeaders(value: Map<String, String>): Builder = apply {
-                _headers.clear()
-                _headers.putAll(value)
-            }
-
-            fun setMethod(value: Method): Builder = apply { method = value }
-
-            fun setQuery(value: Map<String, String>): Builder = apply {
-                _query.clear()
-                _query.putAll(value)
-            }
-
-            fun setUrl(value: String, clearQuery: Boolean = false): Builder = apply {
-                val query = value.substringAfter('?', "").split('&').mapNotNull { param ->
-                    param.split('=', limit = 2).takeIf { it.size == 2 }?.let { (key, value) -> key to value }
-                }.toMap()
-
-                this.url = value.substringBefore('?')
-                if (clearQuery) setQuery(query)
-                else appendQuery(query)
-            }
-        }
 
         val gson: Gson = GsonBuilder().create()
         val jsonObjectResponseType = object : TypeToken<Map<String, *>>() {}
