@@ -1,5 +1,6 @@
 package us.huseli.retaintheme.utils
 
+import android.os.Build
 import android.util.Log
 import us.huseli.retaintheme.snackbar.SnackbarEngine
 
@@ -24,7 +25,9 @@ interface ILogger {
 
     private fun getThreadSignature(): String {
         val thread = Thread.currentThread()
-        val ret = "${thread.name}:${thread.id}:${thread.priority}"
+        @Suppress("DEPRECATION") val threadId =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) thread.threadId() else thread.id
+        val ret = "${thread.name}:${threadId}:${thread.priority}"
 
         return thread.threadGroup?.name?.let { "$ret:$it" } ?: ret
     }

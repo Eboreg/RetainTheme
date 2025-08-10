@@ -43,6 +43,8 @@ inline fun <reified T> Map<*, *>.getAll(vararg paths: Any): List<T> {
     return result.toList()
 }
 
+inline fun <reified T> Iterable<Map<*, *>>.getAll(vararg paths: Any): List<T> = flatMap { it.getAll<T>(*paths) }
+
 fun Map<*, *>.getAllRecursive(key: Any?): List<Any> {
     val found = mutableListOf<Any>()
 
@@ -55,8 +57,6 @@ fun Map<*, *>.getAllRecursive(key: Any?): List<Any> {
 
     return found.toList()
 }
-
-inline fun <reified T> Iterable<Map<*, *>>.getAll(vararg paths: Any): List<T> = flatMap { it.getAll<T>(*paths) }
 
 inline fun <reified T> Map<*, *>.getFirst(vararg paths: Any): T? = getAll<T>(*paths).firstOrNull()
 
