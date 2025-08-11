@@ -8,7 +8,7 @@ inline fun <reified T> Map<*, *>.filterKeysOfType(): Map<T, *> = filterKeys { it
 @Suppress("UNCHECKED_CAST")
 fun <K, V : Any> Map<K, V?>.filterValuesNotNull(): Map<K, V> = filterValues { it != null } as Map<K, V>
 
-inline fun <reified T> Map<*, *>.getAll(vararg paths: Any): List<T> {
+inline fun <reified T> Map<*, *>.getAll(vararg paths: Any): Sequence<T> = sequence {
     /**
      * `paths` is typically strings or lists of strings.
      *
@@ -27,10 +27,8 @@ inline fun <reified T> Map<*, *>.getAll(vararg paths: Any): List<T> {
      * "**" traverses any number of levels, so this will match for all maps with a "bar"
      * key on any level, i.e. all 3 maps above.
      */
-    val result = mutableListOf<T>()
-
     for (pathCandidate in paths) {
-        val maps: MutableList<Map<*, *>> = mutableListOf(this)
+        val maps: MutableList<Map<*, *>> = mutableListOf(this@getAll)
         var lastWasGlob = false
         val path: Collection<*> = pathCandidate as? Collection<*> ?: listOf(pathCandidate)
 
@@ -51,14 +49,12 @@ inline fun <reified T> Map<*, *>.getAll(vararg paths: Any): List<T> {
 
             for (value in values) {
                 if (value != null) {
-                    if (index == path.size - 1 && value is T) result.add(value)
+                    if (index == path.size - 1 && value is T) yield(value)
                     if (value is Map<*, *>) maps.add(value)
                 }
             }
         }
     }
-
-    return result.toList()
 }
 
 inline fun <reified T> Iterable<Map<*, *>>.getAll(vararg paths: Any): List<T> = flatMap { it.getAll<T>(*paths) }
