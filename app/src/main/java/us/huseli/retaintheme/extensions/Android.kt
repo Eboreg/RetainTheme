@@ -64,6 +64,12 @@ fun Uri.Builder.appendQuery(query: Map<String, String>): Uri.Builder = apply {
 
 fun Uri.appendQuery(query: Map<String, String>): Uri = buildUpon().appendQuery(query).build()
 
+val Uri.queryMap: Map<String, String>
+    get() = queryParameterNames.filterNotNull().associateWith { getQueryParameter(it) }.filterValuesNotNull()
+
+val Uri.queryMultiMap: Map<String, List<String>>
+    get() = queryParameterNames.filterNotNull().associateWith { getQueryParameters(it) }
+
 fun ViewModel.launchOnIOThread(block: suspend CoroutineScope.() -> Unit) =
     viewModelScope.launch(Dispatchers.IO, block = block)
 

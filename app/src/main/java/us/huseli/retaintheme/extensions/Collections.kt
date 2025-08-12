@@ -69,7 +69,7 @@ fun <T> Iterable<AnnotatedString.Range<T>>.limit(length: Int): List<AnnotatedStr
         else range.copy(end = length)
     }
 
-fun <T> List<T>.listItemsBetween(item1: T, item2: T, key: (T) -> Any?): List<T> {
+inline fun <T> List<T>.listItemsBetween(item1: T, item2: T, key: (T) -> Any?): List<T> {
     /** from & to are both exclusive */
     val keyList = map { key(it) }
     val item1Index = keyList.indexOf(key(item1))

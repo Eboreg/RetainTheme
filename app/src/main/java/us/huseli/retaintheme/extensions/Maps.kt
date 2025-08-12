@@ -80,6 +80,11 @@ inline fun <reified T> Iterable<Map<*, *>>.getFirst(vararg paths: Any): T? =
 inline fun <reified T> Array<out Map<*, *>>.getFirst(vararg paths: Any): T? =
     firstNotNullOfOrNull { it.getFirst<T>(*paths) }
 
+inline fun <K, V> MutableMap<K, V>.getOrPutOrNull(key: K, defaultValue: () -> V?): V? =
+    get(key) ?: defaultValue()?.also { put(key, it) }
+
+fun <K, V> Map<K, V>.inverse(): Map<V, K> = map { (key, value) -> value to key }.toMap()
+
 fun <K, V> Map<out K, V>.mergeWith(other: Map<out K, V>): Map<K, *> {
     /**
      * Merges with `other` recursively. Example:
@@ -114,7 +119,7 @@ fun Map<*, *>.recursiveUpdate(other: Map<*, *>): Map<*, *> {
     return result.toMap()
 }
 
-fun <K, V> MutableMap<K, V>.setOrMerge(key: K, value: V, mergeFunc: (oldValue: V, newValue: V) -> V): V {
+inline fun <K, V> MutableMap<K, V>.setOrMerge(key: K, value: V, mergeFunc: (oldValue: V, newValue: V) -> V): V {
     val oldValue = get(key)
     val newValue = oldValue?.let { mergeFunc(it, value) } ?: value
 

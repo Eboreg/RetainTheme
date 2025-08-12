@@ -6,11 +6,13 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.annotation.WorkerThread
+import androidx.core.net.toUri
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import us.huseli.retaintheme.RetainConnectionError
 import us.huseli.retaintheme.RetainHttpError
+import us.huseli.retaintheme.extensions.queryMap
 import us.huseli.retaintheme.utils.ILogger
 import us.huseli.retaintheme.utils.LogInstance
 import java.io.InputStream
@@ -181,11 +183,21 @@ class Request(
             setUrl(url, true)
         }
 
-        fun appendHeaders(value: Map<String, String>): Builder = apply { _headers.putAll(value) }
+        override fun equals(other: Any?): Boolean = other is Builder && other.hashCode() == hashCode()
 
-        fun appendQuery(value: Map<String, String>): Builder = apply {
-            _query.putAll(value)
+        override fun hashCode(): Int {
+            var result = _headers.hashCode()
+            result = 31 * result + _query.hashCode()
+            result = 31 * result + (body?.hashCode() ?: 0)
+            result = 31 * result + method.hashCode()
+            result = 31 * result + url.hashCode()
+            return result
         }
+
+        fun appendHeaders(value: Map<String, String>): Builder =
+            apply { if (value.isNotEmpty()) _headers.putAll(value) }
+
+        fun appendQuery(value: Map<String, String>): Builder = apply { if (value.isNotEmpty()) _query.putAll(value) }
 
         fun build(): Request = Request(
             url = url,
@@ -201,24 +213,29 @@ class Request(
 
         fun setHeaders(value: Map<String, String>): Builder = apply {
             _headers.clear()
-            _headers.putAll(value)
+            if (value.isNotEmpty()) _headers.putAll(value)
         }
 
         fun setMethod(value: Method): Builder = apply { method = value }
 
         fun setQuery(value: Map<String, String>): Builder = apply {
             _query.clear()
-            _query.putAll(value)
+            if (value.isNotEmpty()) _query.putAll(value)
         }
 
         fun setUrl(value: String, clearQuery: Boolean = false): Builder = apply {
-            val query = value.substringAfter('?', "").split('&').mapNotNull { param ->
-                param.split('=', limit = 2).takeIf { it.size == 2 }?.let { (key, value) -> key to value }
-            }.toMap()
+            val uri = value.toUri()
+            val query = uri.queryMap
+            // val query = value.substringAfter('?', "").split('&').mapNotNull { param ->
+            //     param.split('=', limit = 2).takeIf { it.size == 2 }?.let { (key, value) -> key to value }
+            // }.toMap()
 
-            this.url = value.substringBefore('?')
-            if (clearQuery) setQuery(query)
-            else appendQuery(query)
+            this.url = uri.buildUpon().clearQuery().build().toString()
+            // this.url = value.substringBefore('?')
+            if (query.isNotEmpty()) {
+                if (clearQuery) setQuery(query)
+                else appendQuery(query)
+            }
         }
     }
 
@@ -251,7 +268,7 @@ class Request(
             json: Any,
             gson: Gson = Request.gson,
         ): Request = Builder(url)
-            .setQuery(query)
+            .appendQuery(query)
             .setHeaders(headers.plus("Content-Type" to "application/json"))
             .setBody(gson.toJson(json))
             .setMethod(Method.POST)
