@@ -55,7 +55,7 @@ fun CharSequence.sanitizeFilename(): String =
     /** Replaces potentially invalid characters with "-". */
     replace(Regex("[/\\\\?%*:|\"<>\\x7F\\x00-\\x1F]"), "-")
 
-fun Collection<String>.stripCommonFixes(): Collection<String> {
+fun Collection<CharSequence>.stripCommonFixes(): Collection<CharSequence> {
     /** Strip prefixes and suffixes that are shared among all the strings. */
     if (size < 2) return this
 
@@ -82,9 +82,9 @@ fun CharSequence.substringMax(startIndex: Int, endIndex: Int) =
      */
     substring(startIndex, kotlin.math.min(endIndex, length))
 
-fun String.takeIfNotBlank() = takeIf { it.isNotBlank() }
+fun CharSequence.takeIfNotBlank() = takeIf { it.isNotBlank() }
 
-fun String.takeIfNotEmpty() = takeIf { it.isNotEmpty() }
+fun CharSequence.takeIfNotEmpty() = takeIf { it.isNotEmpty() }
 
 fun String.toDuration(): Duration {
     /**
@@ -104,11 +104,5 @@ fun String.toDuration(): Duration {
     groups?.get(2)?.value?.toInt()?.minutes?.let { duration += it }
     groups?.get(3)?.value?.toInt()?.seconds?.let { duration += it }
 
-    // TODO remove when made sure above is working
-    /*
-    groups?.get("hours")?.value?.toInt()?.hours?.let { duration += it }
-    groups?.get("minutes")?.value?.toInt()?.minutes?.let { duration += it }
-    groups?.get("seconds")?.value?.toInt()?.seconds?.let { duration += it }
-     */
     return duration
 }

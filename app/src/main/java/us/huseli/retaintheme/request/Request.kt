@@ -4,6 +4,7 @@ package us.huseli.retaintheme.request
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
@@ -34,11 +35,19 @@ class Request(
     private val readTimeout: Int = DEFAULT_READ_TIMEOUT,
     private val suppressLogs: Boolean = false,
 ) : ILogger {
-    enum class Method(val value: String) { GET("GET"), POST("POST") }
+    enum class Method(val value: String) {
+        GET("GET"),
+        POST("POST"),
+        HEAD("HEAD"),
+        OPTIONS("OPTIONS"),
+        PUT("PUT"),
+        DELETE("DELETE"),
+        TRACE("TRACE"),
+    }
 
     val url = constructUrl(url, query)
 
-    var contentLength: Int? = null
+    var contentLength: Long? = null
         private set
     var contentRange: HttpContentRange? = null
         private set
@@ -62,7 +71,14 @@ class Request(
     }
 
     @WorkerThread
+    @Deprecated("Use getBitmapResponse()")
     fun getBitmap(): Bitmap? = getInputStream().use { BitmapFactory.decodeStream(it) }.also { finish() }
+
+    @WorkerThread
+    fun getBitmapResponse(): Response<Bitmap?> = getResponse { BitmapFactory.decodeStream(it) }
+
+    @WorkerThread
+    fun getByteArrayResponse(): Response<ByteArray> = getResponse { it.readBytes() }
 
     @WorkerThread
     fun getInputStream(): InputStream {
@@ -73,25 +89,49 @@ class Request(
     }
 
     @WorkerThread
+    @Deprecated("Use getJsonArrayResponse()")
     fun getJsonArray(gson: Gson = Request.gson): List<*> = getInputStream().use {
         gson.fromJson(it.bufferedReader(), jsonArrayResponseType) ?: emptyList<Any>()
     }.also { finish() }
 
     @WorkerThread
+    fun getJsonArrayResponse(gson: Gson = Request.gson): Response<List<*>> = getResponse {
+        gson.fromJson(it.bufferedReader(), jsonArrayResponseType) ?: emptyList<Any>()
+    }
+
+    @WorkerThread
+    @Deprecated("Use getJsonObjectResponse()")
     fun getJsonObject(gson: Gson = Request.gson): Map<String, *> = getInputStream().use {
         gson.fromJson(it.bufferedReader(), jsonObjectResponseType) ?: emptyMap<String, Any>()
     }.also { finish() }
 
     @WorkerThread
+    fun getJsonObjectResponse(gson: Gson = Request.gson): Response<Map<String, *>> = getResponse {
+        gson.fromJson(it.bufferedReader(), jsonObjectResponseType) ?: emptyMap<String, Any>()
+    }
+
+    @WorkerThread
+    @Deprecated("Use getObjectResponse()")
     inline fun <reified T> getObject(gson: Gson = Request.gson): T =
         getInputStream().use { gson.fromJson(it.bufferedReader(), T::class.java) }.also { finish() }
 
     @WorkerThread
+    inline fun <reified T> getObjectResponse(gson: Gson = Request.gson): Response<T> =
+        getResponse { gson.fromJson(it.bufferedReader(), T::class.java) }
+
+    @WorkerThread
+    @Deprecated("Use getObjectResponse()")
     fun <T> getObject(typeOfT: Type, gson: Gson = Request.gson): T =
         getInputStream().use { gson.fromJson<T>(it.bufferedReader(), typeOfT) }.also { finish() }
 
     @WorkerThread
+    fun <T> getObjectResponse(typeOfT: Type, gson: Gson = Request.gson): Response<T> =
+        getResponse { gson.fromJson<T>(it.bufferedReader(), typeOfT) }
+
+    @WorkerThread
+    @Deprecated("Use getObjectResponseOrNull()")
     inline fun <reified T> getObjectOrNull(gson: Gson = Request.gson): T? = try {
+        @Suppress("DEPRECATION")
         getObject<T>(gson)
     } catch (e: Throwable) {
         logError("getObjectOrNull(): $method $url", e)
@@ -99,7 +139,17 @@ class Request(
     }
 
     @WorkerThread
+    inline fun <reified T> getObjectResponseOrNull(gson: Gson = Request.gson): Response<T>? = try {
+        getObjectResponse<T>(gson)
+    } catch (e: Throwable) {
+        logError("getObjectOrNullResponse(): $method $url", e)
+        null
+    }
+
+    @WorkerThread
+    @Deprecated("Use getObjectResponseOrNull()")
     fun <T> getObjectOrNull(typeOfT: Type, gson: Gson = Request.gson): T? = try {
+        @Suppress("DEPRECATION")
         getObject(typeOfT, gson)
     } catch (e: Throwable) {
         logError("getObjectOrNull(): $method $url", e)
@@ -107,8 +157,49 @@ class Request(
     }
 
     @WorkerThread
+    fun <T> getObjectResponseOrNull(typeOfT: Type, gson: Gson = Request.gson): Response<T>? = try {
+        getObjectResponse(typeOfT, gson)
+    } catch (e: Throwable) {
+        logError("getObjectResponseOrNull(): $method $url", e)
+        null
+    }
+
+    @WorkerThread
+    fun <T> getResponse(callback: (InputStream) -> T): Response<T> {
+        val start = System.currentTimeMillis()
+        val conn = connect()
+        val isGzipped = conn.headerFields["Content-Encoding"]?.contains("gzip") == true
+        val inputStream = if (isGzipped) GZIPInputStream(conn.inputStream) else conn.inputStream
+        val data = inputStream.use { callback(it) }
+        val contentRange = conn.getHeaderField("Content-Range")?.parseContentRange()
+        val contentLength = when {
+            contentRange?.size != null -> contentRange.size
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> conn.contentLengthLong
+            else -> conn.getHeaderField("Content-Length")?.toLong()
+        }
+        val elapsed = System.currentTimeMillis() - start
+        val elapsedSeconds = elapsed.toDouble() / 1000
+
+        return Response(
+            request = this,
+            responseCode = conn.responseCode,
+            responseMessage = conn.responseMessage,
+            contentLength = contentLength,
+            headers = conn.headerFields,
+            contentRange = contentRange,
+            data = data,
+            elapsed = elapsed,
+            kbps = contentLength?.let { ((it / elapsedSeconds) / 1024).roundToInt() },
+        )
+    }
+
+    @WorkerThread
+    @Deprecated("Use getStringResponse()")
     fun getString(): String =
         getInputStream().use { it.bufferedReader().readText() }.also { finish(it.length) }
+
+    @WorkerThread
+    fun getStringResponse(): Response<String> = getResponse { it.bufferedReader().readText() }
 
     private fun connect(): HttpURLConnection {
         requestStart = System.currentTimeMillis()
@@ -150,7 +241,7 @@ class Request(
         )
 
         contentRange = conn.getHeaderField("Content-Range")?.parseContentRange()
-        contentLength = contentRange?.size ?: conn.getHeaderField("Content-Length")?.toInt()
+        contentLength = contentRange?.size ?: conn.getHeaderField("Content-Length")?.toLong()
 
         return conn
     }
@@ -197,7 +288,11 @@ class Request(
         fun appendHeaders(value: Map<String, String>): Builder =
             apply { if (value.isNotEmpty()) _headers.putAll(value) }
 
+        fun appendHeaders(vararg value: Pair<String, String>): Builder = appendHeaders(value.toMap())
+
         fun appendQuery(value: Map<String, String>): Builder = apply { if (value.isNotEmpty()) _query.putAll(value) }
+
+        fun appendQuery(vararg value: Pair<String, String>): Builder = appendQuery(value.toMap())
 
         fun build(): Request = Request(
             url = url,
@@ -209,12 +304,18 @@ class Request(
             readTimeout = readTimeout,
         )
 
+        fun deleteHeaders(vararg keys: String): Builder = apply { keys.forEach { _headers.remove(it) } }
+
+        fun deleteQuery(vararg keys: String): Builder = apply { keys.forEach { _query.remove(it) } }
+
         fun setBody(value: String?): Builder = apply { body = value }
 
         fun setHeaders(value: Map<String, String>): Builder = apply {
             _headers.clear()
             if (value.isNotEmpty()) _headers.putAll(value)
         }
+
+        fun setHeaders(vararg value: Pair<String, String>): Builder = setHeaders(value.toMap())
 
         fun setMethod(value: Method): Builder = apply { method = value }
 
@@ -223,15 +324,14 @@ class Request(
             if (value.isNotEmpty()) _query.putAll(value)
         }
 
+        fun setQuery(vararg value: Pair<String, String>): Builder = setQuery(value.toMap())
+
         fun setUrl(value: String, clearQuery: Boolean = false): Builder = apply {
             val uri = value.toUri()
             val query = uri.queryMap
-            // val query = value.substringAfter('?', "").split('&').mapNotNull { param ->
-            //     param.split('=', limit = 2).takeIf { it.size == 2 }?.let { (key, value) -> key to value }
-            // }.toMap()
 
             this.url = uri.buildUpon().clearQuery().build().toString()
-            // this.url = value.substringBefore('?')
+
             if (query.isNotEmpty()) {
                 if (clearQuery) setQuery(query)
                 else appendQuery(query)
@@ -269,7 +369,8 @@ class Request(
             gson: Gson = Request.gson,
         ): Request = Builder(url)
             .appendQuery(query)
-            .setHeaders(headers.plus("Content-Type" to "application/json"))
+            .setHeaders(headers)
+            .appendHeaders("Content-Type" to "application/json")
             .setBody(gson.toJson(json))
             .setMethod(Method.POST)
             .build()
